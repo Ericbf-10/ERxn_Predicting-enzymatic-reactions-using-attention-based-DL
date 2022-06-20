@@ -11,6 +11,9 @@ processed_data_dir = os.path.join(data_dir, 'processed')
 uniprot_files = os.path.join(processed_data_dir, '01_uniprot_and_EC.csv')
 dest = os.path.join(data_dir, 'fastas')
 
+if not os.path.exists(dest):
+    os.makedirs(dest)
+
 def get_fasta(cID, dest):
     baseUrl="http://www.uniprot.org/uniprot/"
     currentUrl=baseUrl+cID+".fasta"

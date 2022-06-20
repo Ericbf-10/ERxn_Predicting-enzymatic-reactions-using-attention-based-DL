@@ -2,7 +2,10 @@ import os
 
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
-raw_data_dir = os.path.join(data_dir, 'raw')
+dest = os.path.join(data_dir, 'raw')
+
+if not os.path.exists(dest):
+    os.makedirs(dest)
 
 expasy_url = 'https://ftp.expasy.org/databases/enzyme/enzyme.dat'
-os.system(f'wget {expasy_url} -P {raw_data_dir}')
+os.system(f'wget {expasy_url} -P {dest}')

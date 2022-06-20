@@ -7,6 +7,9 @@ raw_data_dir = os.path.join(data_dir, 'raw')
 raw_data_file = os.path.join(raw_data_dir, 'enzyme.dat')
 dest = os.path.join(data_dir, 'processed')
 
+if not os.path.exists(dest):
+    os.makedirs(dest)
+
 ID_and_uniprot = {}
 with open(raw_data_file, 'r') as f:
     for line in f:
