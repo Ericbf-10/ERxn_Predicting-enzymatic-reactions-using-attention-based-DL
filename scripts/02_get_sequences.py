@@ -39,9 +39,10 @@ cIDs = data.protein.to_list()
 downloaded = os.listdir(dest)
 downloaded = [file[:-6] for file in downloaded]
 
-for cID in tqdm(cIDs):
-    if cID not in downloaded:
-        try:
-            get_fasta(cID, dest)
-        except:
-            pass
+for i in range(100):
+    for cID in tqdm(cIDs):
+        if cID not in downloaded:
+            try:
+                get_fasta(cID, dest)
+            except:
+                pass
