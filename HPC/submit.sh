@@ -26,7 +26,7 @@
 >train.out
 >train.err
 
-cd ~/projects/gibbs_sampler/scripts
+cd ~/projects/ERxn/scripts
 module load cuda/11.3
 module load python3/3.7.11
 module load pandas/1.3.1-python-3.7.11
