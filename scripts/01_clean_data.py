@@ -41,5 +41,5 @@ data = pd.DataFrame({
     'protein': IDs,
     'EC': ECs
 })
-
+data = data.drop_duplicates()
 data.to_csv(f'{dest}/01_uniprot_and_EC.csv', index=None, sep=',')
