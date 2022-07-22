@@ -42,4 +42,4 @@ data = pd.DataFrame({
     'EC': ECs
 })
 data = data.drop_duplicates()
-data.to_csv(f'{dest}/01_uniprot_and_EC.csv', index=None, sep=',')
+data.to_csv(f'{dest}/01_uniprotID_and_EC.csv', index=None, sep=',')
