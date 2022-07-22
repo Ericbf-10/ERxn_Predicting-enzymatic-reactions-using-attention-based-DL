@@ -8,7 +8,7 @@ from tqdm import tqdm
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
 processed_data_dir = os.path.join(data_dir, 'processed')
-uniprot_files = os.path.join(processed_data_dir, '01_uniprot_and_EC.csv')
+uniprot_files = os.path.join(processed_data_dir, '01_uniprotID_and_EC.csv')
 dest = os.path.join(data_dir, 'fastas')
 
 if not os.path.exists(dest):
@@ -39,10 +39,11 @@ def get_fasta(cID, dest):
 data = pd.read_csv(uniprot_files)
 cIDs = data.protein.to_list()
 
-downloaded = os.listdir(dest)
-downloaded = [file[:-6] for file in downloaded]
-
-for i in range(100):
+for i in range(10):
+    # multiple attempts of downloading all files in case of server errors
+    downloaded = os.listdir(dest)
+    downloaded = [file[:-6] for file in downloaded]
+    cIDs = [x for x in cIDs if x not in downloaded]
     for cID in tqdm(cIDs):
         if cID not in downloaded:
             try:
