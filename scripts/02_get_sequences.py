@@ -50,3 +50,6 @@ for i in range(10):
                 get_fasta(cID, dest)
             except:
                 pass
+
+print(f'downloaded sequences: {len(downloaded)}')
+print(f'sequences failed to download: {len(cIDs)}')
