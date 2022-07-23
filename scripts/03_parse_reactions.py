@@ -6,6 +6,7 @@ script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
 raw_data_dir = os.path.join(data_dir, 'raw')
 raw_data_file = os.path.join(raw_data_dir, 'enzyme.dat')
+processed_data_dir = os.path.join(data_dir, 'processed')
 uniprot_and_EC_data_path = os.path.join(data_dir, 'processed/02_uniprotID_and_EC_reduced.csv')
 dest = os.path.join(data_dir, 'processed')
 
@@ -36,7 +37,7 @@ def clean_reactions(reactions):
     # multiple reactions
     all_reactions = []
     if len(reactions) > 1:
-        merged_reactions = "".join(reactions).replace('\n', '').split('.')[:-1]
+        merged_reactions = ''.join(reactions).replace('\n', '').split('.')[:-1]
         for reaction in merged_reactions:
             for i in range(1,7):
                 reaction = reaction.replace(f'CA   ({i}) ', '')
@@ -53,11 +54,19 @@ data = pd.read_csv(uniprot_and_EC_data_path)
 unique_EC_numbers = pd.unique(data.EC)
 
 # parse all reactions using parallelization (handle cores and parallelization with argparse in the future)
-reactions = Parallel(n_jobs=8)(delayed(get_reactions)(EC, raw_data_file) for EC in unique_EC_numbers)
+all_reactions = Parallel(n_jobs=8)(delayed(get_reactions)(EC, raw_data_file) for EC in unique_EC_numbers)
 
-print(reactions)
+ECs = []
+rxns = []
+for i, reactions in enumerate(all_reactions):
+    for reaction in reactions:
+        ECs.append(unique_EC_numbers[i])
+        rxns.append(reaction)
 
 
+data = pd.DataFrame({
+    'EC':ECs,
+    'reaction':rxns
+})
 
-
-
+data.to_csv(f'{processed_data_dir}/03_ECs_and_reactions.csv', index=None, sep=',')
