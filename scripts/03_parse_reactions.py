@@ -44,6 +44,7 @@ def clean_reactions(reactions):
             reaction = reaction.replace('+CA   ',' ')
             reaction = reaction.replace('CA   ', ' ')
             reaction = reaction.replace('  ', ' ')
+            reaction = reaction.replace('- ', '-')
             if reaction.startswith(' '):
                 reaction = reaction[1:]
             all_reactions.append(reaction)
