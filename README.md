@@ -1,5 +1,6 @@
 # ERxn
 
+## Introduction
 The enzyme reaction dataset is desgined for 
 machine learning applications using enzymes
 based on the [ENZYME](https://enzyme.expasy.org/) 
@@ -17,5 +18,33 @@ Commission) number has been provided
 The ERxn dataset contains all enzymes which
 have available fasta sequences and their 
 corresponding EC numbers, reactions in
-form of smiles and co-factors
+form of smiles and co-factors.
 
+## Usage
+___
+
+### download raw data
+downloads raw data from Expasy ENZYME database and places
+it in data/raw/enzyme.dat
+
+``` 
+python 00_get_raw_data.py
+```
+
+### parse uniprot IDs and EC numbers
+parses uniprot IDs and EC numbers from enzyme.dat and saves
+them in a csv file under 
+data/processed/01_uniprotID_and_EC_reduced.csv
+
+``` 
+python 01_parse_uniprotIDs_and_ECs.py
+```
+### download fasta files
+
+downloads fasta files from 
+http://www.uniprot.org/uniprot/ and places them in
+data/fastas/<UNIPROTID>.fasta
+
+``` 
+python 02_get_fastas.py
+```
