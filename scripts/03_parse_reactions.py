@@ -41,7 +41,7 @@ def clean_reactions(reactions):
         for reaction in merged_reactions:
             for i in range(1,7):
                 reaction = reaction.replace(f'CA   ({i}) ', '')
-            reaction = reaction.replace('+CA   ',' ')
+            reaction = reaction.replace('+CA   ', '+ ')
             reaction = reaction.replace('CA   ', ' ')
             reaction = reaction.replace('  ', ' ')
             reaction = reaction.replace('- ', '-')
