@@ -13,7 +13,7 @@ compounds_smile_data = os.path.join(dest, '04_compounds_smiles_mapper.csv')
 # get all compound names
 reactions = pd.read_csv(reactions_data)['reaction']
 
-def split_reaction(reaction, filter=True):
+def split_reaction(reaction):
     educts = reaction.split(' = ')[0]
     products = reaction.split(' = ')[1]
     educts = educts.split(' + ')
@@ -76,7 +76,7 @@ def get_synonym(compound):
 
     return compound
 
-def get_synonym2(compound):
+def reformat_brackets(compound):
     results = list(parenthetic_contents(compound))
 
     max_ = 0
@@ -100,6 +100,7 @@ def get_synonym2(compound):
         indices = r[2]
         compound = compound[:indices[0]-1] + brackets[r[0]][0] + compound[indices[0]:indices[1]] + brackets[r[0]][1] + compound[indices[1]+1:]
     return compound
+
 
 def filter_compounds(compounds, synonyms):
 
@@ -165,6 +166,7 @@ else:
     rejected_compounds = []
     skip_basic_search = False
 
+
 # synonyms for some common compounds
 synonyms = {
     'NAD(P)(+)': 'NADP(+)',
@@ -224,7 +226,7 @@ for rejected_compound in tqdm(rejected_compounds):
     if rejected_compound in synonyms.keys():
         synonym = synonyms[rejected_compound]
     else:
-        synonym = get_synonym2(rejected_compound)
+        synonym = reformat_brackets(rejected_compound)
 
     if synonym == rejected_compound:
         pass
