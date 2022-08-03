@@ -56,20 +56,28 @@ for i, reaction in reactions.iterrows():
         n_compounds = len(compounds)
         count = 0
 
-        # remove everything that has no smile
-        for j, compound in enumerate(sorted(compounds, key=len, reverse=True)):
-            if compound in synonyms.keys():
-                compound = synonyms[compound]
-            if compound not in compounds_with_smiles:
-                reaction = reaction.replace(sorted(compounds, key=len, reverse=True)[j], '')
+        compounds = sorted(compounds, key=len, reverse=True)
+        compounds_with_stoichiometry = sorted(compounds_with_stoichiometry, key=len, reverse=True)
 
+        # remove everything that has no smile or add smile
         for j, compound in enumerate(compounds):
+
             if compound in synonyms.keys():
                 synonym = synonyms[compound]
-                synonym_with_stoichiometry = compounds_with_stoichiometry[j].replace(compound, synonym)
-                reaction = reaction.replace(compounds_with_stoichiometry[j], synonym_with_stoichiometry)
-                compounds[j] = synonym
-                compounds_with_stoichiometry[j] = synonym_with_stoichiometry
+                synonym_with_stoichiometry = compounds_with_stoichiometry[j].replace(compound, synonyms[compound])
+                if synonym not in compounds_with_smiles:
+                    reaction = reaction.replace(synonym_with_stoichiometry, '')
+                else:
+                    reaction = reaction.replace(compound, smile_data.loc[smile_data['name'] == synonym, 'smile'].item())
+                    count += 1
+
+            else:
+                if compound not in compounds_with_smiles:
+                    reaction = reaction.replace(compounds_with_stoichiometry[j], '')
+
+                else:
+                    reaction = reaction.replace(compound, smile_data.loc[smile_data['name'] == compound, 'smile'].item())
+                    count += 1
 
         # case first reactant is removed
         if reaction.startswith(' + '):
@@ -86,11 +94,6 @@ for i, reaction in reactions.iterrows():
         # intermediate product or educt is removed
         if '+  +' in reaction:
             reaction = reaction.replace('+  +', '+')
-
-        for j, compound in enumerate(compounds):
-            if compound in compounds_with_smiles:
-                reaction = reaction.replace(compound, smile_data.loc[smile_data['name'] == compound, 'smile'].item())
-                count += 1
 
         # last product removed
         if reaction.endswith(' + '):
