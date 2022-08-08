@@ -36,4 +36,3 @@ with tarfile.open(compressed_AF_files) as tarf:
         if member.name.split('-')[1] in uniprotIDs:
             tarf.extract(member, dest)
 
-print(os.listdir(dest))
