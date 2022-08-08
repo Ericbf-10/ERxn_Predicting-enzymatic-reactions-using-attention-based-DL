@@ -48,3 +48,44 @@ data/fastas/<UNIPROTID>.fasta
 ``` 
 python 02_get_fastas.py
 ```
+
+### parse reactions
+
+extract all chemical reactions from the raw enzyme.dat 
+file.
+
+``` 
+python 03_parse_reactions.py
+```
+
+### get the SMILEs for each compound
+
+Download the SMILEs for each possible compound using
+the PubChemPy API.
+
+``` 
+python 04_mol_name_to_smile.py
+```
+
+### map reactions
+
+Express all available reactions using SMILES where 
+possible. If not entirely possible then partially map
+the reactions and leave unknowns aside.
+Discard reactions which can't be expressed in SMILES at all.
+
+``` 
+python 05_map_reactions.py
+```
+
+### get pdb files from the AlphaFold DB
+
+Download the Swiss-Prot DB containing all predicted pdb
+using AlphaFold v2. from the AlphaFold DB.
+The entire Swiss-Prot DB is way larger than needed,
+therefore, downloaded to external drive first. Selected
+files will then be extracted from the entire tar.
+
+``` 
+python 06_get_pdbs.py
+```
