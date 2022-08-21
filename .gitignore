@@ -134,3 +134,4 @@ dmypy.json
 # ignore pdb
 *.pdb
 *.pdb.gz
+*.fasta.gz

@@ -4,19 +4,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 from perceiver_pytorch import Perceiver
+import pandas as pd
 
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
 processed_data_dir = os.path.join(data_dir, 'processed')
 pdb_files_path = os.path.join(data_dir, 'pdbs')
-dest = os.path.join(data_dir, 'micro_environments')
-
-if not os.path.exists(dest):
-    os.makedirs(dest)
+dataset_path = os.path.join(data_dir, 'datasets/07_protein_voxelization_dataset.csv')
 
 # open pdb file, save coordinates and atom types
-
-def get_atoms(pdb):
+def get_protein_voxels(pdb):
     '''
     takes a pdb file and saves the atom coordinates of carbon, oxygen,
     nitrogen and sulfur atoms as stacked 3 dimensional np arrays
@@ -70,16 +67,35 @@ def get_atoms(pdb):
     atom_boxes = np.stack([carbon_box, oxygen_box, nitrogen_box, sulfur_box], axis=3)
     return atom_boxes
 
+def one_hot_encoder(y_list):
+    '''
+    takes a list of objects and returns a list of one-hot-encoded vectors
+    '''
+    unique_labels = []
+    for y in y_list:
+        if y in unique_labels:
+            pass
+        else:
+            unique_labels.append(y)
+    unique_labels = sorted(unique_labels)
 
-# example file
-pdb_files = [f for f in os.listdir(pdb_files_path) if f.endswith('pdb.gz')]
-example_file_name = np.random.choice(pdb_files)
-example_file = os.path.join(pdb_files_path, example_file_name)
-MICRO_BOX_SIZE = 15
+    encoder = {}
+    for i, y in enumerate(unique_labels):
+        if y in encoder.keys():
+            pass
+        else:
+            encoder[y] = i
 
+    zero_vector = [0 for i in range(len(unique_labels))]
+    encoded_ys = []
+    for y in y_list:
+        zero_vector[encoder[y]] = 1
 
-# get atom boxes
-atom_boxes = get_atoms(example_file)
+        encoded_y = zero_vector
+        encoded_ys.append(encoded_y)
+        zero_vector[encoder[y]] = 0
+
+    return encoded_ys
 
 model = Perceiver(
     input_channels = 4,          # number of channels for each token of the input - in my case 4 atom chanels
@@ -101,6 +117,36 @@ model = Perceiver(
     fourier_encode_data = True,  # whether to auto-fourier encode the data, using the input_axis given. defaults to True, but can be turned off if you are fourier encoding the data yourself
     self_per_cross_attn = 2      # number of self attention blocks per cross attention
 )
+
+# load dataset
+dataset = pd.read_csv(dataset_path)
+
+# one hot encoding of y-values
+dataset['y'] = one_hot_encoder(dataset['EC'].to_list())
+print(dataset)
+asdf
+
+# 80 - 15 - 5 split
+training_data = dataset.sample(frac=0.8)
+test_data = dataset.drop(training_data.index).sample(frac=0.15)
+validation_data = dataset.drop(training_data.index).drop(test_data.index)
+
+print(dataset)
+print(test_data)
+print(validation_data)
+asdf
+
+# example file
+pdb_files = [f for f in os.listdir(pdb_files_path) if f.endswith('pdb.gz')]
+example_file_name = np.random.choice(pdb_files)
+example_file = os.path.join(pdb_files_path, example_file_name)
+MICRO_BOX_SIZE = 15
+
+
+# get atom boxes
+atom_boxes = get_protein_voxels(example_file)
+
+
 
 
 
