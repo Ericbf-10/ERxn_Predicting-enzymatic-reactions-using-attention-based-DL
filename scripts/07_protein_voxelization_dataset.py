@@ -95,8 +95,8 @@ protein_names = []
 
 EC_numbers = []
 pdb_files = [f for f in os.listdir(pdb_files_path) if f.endswith('pdb.gz')]
-for file in pdb_files:
 
+for file in pdb_files:
     protein_name = file.split('-')[1]
     file = os.path.join(pdb_files_path, file)
 
