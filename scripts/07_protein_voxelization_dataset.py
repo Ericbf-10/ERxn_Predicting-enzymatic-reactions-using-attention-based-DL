@@ -97,16 +97,19 @@ EC_numbers = []
 pdb_files = [f for f in os.listdir(pdb_files_path) if f.endswith('pdb.gz')]
 
 for file in pdb_files:
-    protein_name = file.split('-')[1]
-    file = os.path.join(pdb_files_path, file)
+    try:
+        protein_name = file.split('-')[1]
+        file = os.path.join(pdb_files_path, file)
 
-    EC_number = uniprot_and_EC_data[uniprot_and_EC_data['protein'] == protein_name]['EC'].values[0]
-    protein_voxels = get_protein_voxels(file)
+        EC_number = uniprot_and_EC_data[uniprot_and_EC_data['protein'] == protein_name]['EC'].values[0]
+        protein_voxels = get_protein_voxels(file)
 
-    protein_names.append(protein_name)
-    EC_numbers.append(EC_number)
-    with open(os.path.join(protein_voxels_path, f'{protein_name}.npy'), 'wb') as f:
-        np.save(f, protein_voxels)
+        protein_names.append(protein_name)
+        EC_numbers.append(EC_number)
+        with open(os.path.join(protein_voxels_path, f'{protein_name}.npy'), 'wb') as f:
+            np.save(f, protein_voxels)
+    except:
+        pass
 
 
 
