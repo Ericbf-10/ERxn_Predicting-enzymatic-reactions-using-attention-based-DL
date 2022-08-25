@@ -1,5 +1,4 @@
 import os
-import gzip
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -51,7 +50,7 @@ dataset = pd.DataFrame({
 })
 
 print(dataset)
-dataset.to_csv(os.path.join(dest, '07_protein_voxelization_dataset.csv'), index=False)
+dataset.to_csv(os.path.join(dest, '07_pdb_EC_dataset.csv'), index=False)
 
 # # plot
 # PLOT = False
