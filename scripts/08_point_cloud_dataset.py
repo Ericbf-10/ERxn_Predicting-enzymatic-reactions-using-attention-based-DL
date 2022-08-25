@@ -71,7 +71,7 @@ for file in pdb_file_names:
         file = os.path.join(pdb_files_path, file)
         EC_number = uniprot_and_EC_data[uniprot_and_EC_data['protein'] == protein_name]['EC'].values[0]
         point_cloud = get_point_cloud(file)
-        point_cloud_path = os.path.join(dest, protein_name + '.txt')
+        point_cloud_path = os.path.join(protein_name + '.txt')
 
         point_clouds.append(point_cloud_path)
         EC_numbers.append(EC_number)
