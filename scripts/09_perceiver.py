@@ -7,7 +7,7 @@ import torch
 from perceiver_pytorch import Perceiver
 import sys
 sys.path.append('functions/')
-from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, collate_fn_padd
+from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, my_collate
 from functions.customDataset import point_cloud_dataset
 
 script_path = os.path.dirname(__file__)
@@ -15,6 +15,10 @@ data_dir = os.path.join(script_path, '../data')
 processed_data_dir = os.path.join(data_dir, 'processed')
 pdb_files_path = os.path.join(data_dir, 'pdbs')
 dataset_path = os.path.join(data_dir, 'datasets/08_point_cloud_dataset.csv')
+point_cloud_path = os.path.join(data_dir, 'point_cloud_dataset')
+
+# use GPU if available
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # load dataset
 dataset = pd.read_csv(dataset_path)
@@ -29,15 +33,17 @@ validation_data = dataset.drop(training_data.index).drop(test_data.index)
 
 
 # dataset and data loader
-train = point_cloud_dataset(df=training_data)
+train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
 
 train_loader = torch.utils.data.DataLoader(
     train,
-    batch_size=2,
-    collate_fn=collate_fn_padd)
+    batch_size=10,
+    collate_fn=my_collate,
+    pin_memory=True)
 
-for i, (x, y) in enumerate(train_loader):
-    print(i, x, y)
+for i, (x,y) in enumerate(train_loader):
+    print(i, x,y)
+
 #it = iter(train)
 #first = next(it)
 aasdf

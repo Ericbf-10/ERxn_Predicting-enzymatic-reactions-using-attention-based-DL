@@ -1,5 +1,8 @@
 import numpy as np
 import torch
+import torch.nn.functional as F
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def invoke(early_stopping, loss, model, implement=False):
     if implement == False:
@@ -79,29 +82,22 @@ def one_hot_encoder(y_list):
         else:
             encoder[y] = i
 
-    zero_vector = [0 for i in range(len(unique_labels))]
+
     encoded_ys = []
     for y in y_list:
+        zero_vector = [0 for i in range(len(unique_labels))]
         zero_vector[encoder[y]] = 1
-
         encoded_y = zero_vector
         encoded_ys.append(encoded_y)
-        zero_vector[encoder[y]] = 0
 
     return encoded_ys
 
-def collate_fn_padd(batch):
-    '''
-    Padds batch of variable length
+from torch.nn.utils.rnn import pack_sequence
+from torch.utils.data import DataLoader
 
-    note: it converts things ToTensor manually here since the ToTensor transform
-    assume it takes in images rather than arbitrary tensors.
-    '''
-    ## get sequence lengths
-    lengths = torch.tensor([ t.shape[0] for t in batch ]).to(device)
-    ## padd
-    batch = [ torch.Tensor(t).to(device) for t in batch ]
-    batch = torch.nn.utils.rnn.pad_sequence(batch)
-    ## compute mask
-    mask = (batch != 0).to(device)
-    return batch, lengths, mask
+def my_collate(batch):
+    # batch contains a list of tuples of structure (sequence, target)
+    data = [item[0] for item in batch]
+    data = pack_sequence(data, enforce_sorted=False)
+    targets = [item[1] for item in batch]
+    return [data, targets]
