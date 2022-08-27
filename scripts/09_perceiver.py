@@ -45,6 +45,7 @@ WEIGHT_DECAY = 1e-4
 PATIENCE = 0.01
 NUM_EPOCHS = 3000
 BATCH_SIZE = 10
+PIN_MEMORY = True
 
 # dataset and data loader
 #train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
@@ -56,19 +57,19 @@ train_loader = torch.utils.data.DataLoader(
     train,
     batch_size=BATCH_SIZE,
     collate_fn=collate_voxels,
-    pin_memory=True)
+    pin_memory=PIN_MEMORY)
 
 test_loader = torch.utils.data.DataLoader(
     test,
     batch_size=len(test),
     collate_fn=collate_voxels,
-    pin_memory=True)
+    pin_memory=PIN_MEMORY)
 
 valid_loader = torch.utils.data.DataLoader(
     valid,
     batch_size=len(valid),
     collate_fn=collate_voxels,
-    pin_memory=True)
+    pin_memory=PIN_MEMORY)
 
 model = Perceiver(
     input_channels = 4,          # number of channels for each token of the input - in my case 4 atom chanels
@@ -103,8 +104,8 @@ for epoch in range(NUM_EPOCHS):
     model.train()
     for i, (x_train, y_train, _, _) in enumerate(train_loader):
         # attach to device
-        x_train = x_train.to(device)
-        y_train = y_train.to(device).reshape([len(x_train), -1])
+        x_train = x_train.cuda(non_blocking=PIN_MEMORY)
+        y_train = y_train.reshape([len(x_train), -1]).cuda(non_blocking=PIN_MEMORY)
         optimizer.zero_grad()
 
         # forward + backward + optimize
