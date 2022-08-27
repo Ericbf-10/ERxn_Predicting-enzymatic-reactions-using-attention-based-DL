@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+from torch.nn.utils.rnn import pad_sequence
 import torch.nn.functional as F
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -101,3 +102,23 @@ def my_collate(batch):
     data = pack_sequence(data, enforce_sorted=False)
     targets = [item[1] for item in batch]
     return [data, targets]
+
+def pad_collate(batch):
+    (xx, yy) = zip(*batch)
+    x_lens = [x.shape for x in xx]
+    y_lens = [y.shape for y in yy]
+
+    x_max = max([x[0] for x in x_lens])
+    y_max = max([y[1] for y in x_lens])
+    z_max = max([z[2] for z in x_lens])
+
+    xx_pad = []
+    for x in xx:
+        target = torch.zeros(x_max, y_max, z_max, 4)
+        target[:x.shape[0],:x.shape[1],:x.shape[2],:] = x
+        xx_pad.append(target)
+
+    yy_pad = torch.stack(yy).type(torch.FloatTensor)
+    xx_pad = torch.stack(xx_pad)
+
+    return xx_pad, yy_pad, x_lens, y_lens

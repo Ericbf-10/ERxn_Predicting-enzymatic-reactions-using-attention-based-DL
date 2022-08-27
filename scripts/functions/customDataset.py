@@ -72,3 +72,17 @@ class point_cloud_dataset(Dataset):
         protein = torch.tensor(np.loadtxt(point_cloud_path))
         label = torch.tensor(self.annotations.iloc[index, 2])
         return (protein, label)
+
+
+class voxel_dataset(Dataset):
+    def __init__(self, df, ):
+        self.annotations = df
+
+    def __len__(self):
+        return len(self.annotations)
+
+    def __getitem__(self, index):
+        pdb_path = self.annotations.iloc[index, 0]
+        protein = torch.tensor(get_protein_voxels(pdb_path))
+        label = torch.tensor(self.annotations.iloc[index, 2])
+        return (protein, label)

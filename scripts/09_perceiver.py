@@ -1,21 +1,25 @@
 import os
-import gzip
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import torch
+import torch.nn as nn
 from perceiver_pytorch import Perceiver
 import sys
 sys.path.append('functions/')
-from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, my_collate
-from functions.customDataset import point_cloud_dataset
+from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, pad_collate
+from functions.customDataset import point_cloud_dataset, voxel_dataset
+from sklearn.metrics import roc_curve, auc, matthews_corrcoef
 
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
 processed_data_dir = os.path.join(data_dir, 'processed')
 pdb_files_path = os.path.join(data_dir, 'pdbs')
-dataset_path = os.path.join(data_dir, 'datasets/08_point_cloud_dataset.csv')
 point_cloud_path = os.path.join(data_dir, 'point_cloud_dataset')
+
+# Choose data set
+#dataset_path = os.path.join(data_dir, 'datasets/08_point_cloud_dataset.csv')
+dataset_path = os.path.join(data_dir, 'datasets/07_pdb_EC_dataset.csv')
 
 # use GPU if available
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -25,6 +29,7 @@ dataset = pd.read_csv(dataset_path)
 
 # one hot encoding of y-values
 dataset['y'] = one_hot_encoder(dataset['EC'].to_list())
+N_CLASSES = len(dataset['y'][0])
 
 # 80 - 15 - 5 split
 training_data = dataset.sample(frac=0.8)
@@ -33,23 +38,32 @@ validation_data = dataset.drop(training_data.index).drop(test_data.index)
 
 
 # dataset and data loader
-train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
+#train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
+train = voxel_dataset(df=training_data)
+test = voxel_dataset(df=test_data)
+valid = voxel_dataset(df=validation_data)
 
 train_loader = torch.utils.data.DataLoader(
     train,
-    batch_size=10,
-    collate_fn=my_collate,
+    batch_size=2,
+    collate_fn=pad_collate,
     pin_memory=True)
 
-for i, (x,y) in enumerate(train_loader):
-    print(i, x,y)
+test_loader = torch.utils.data.DataLoader(
+    test,
+    batch_size=len(test),
+    collate_fn=pad_collate,
+    pin_memory=True)
 
-#it = iter(train)
-#first = next(it)
-aasdf
+valid_loader = torch.utils.data.DataLoader(
+    valid,
+    batch_size=len(valid),
+    collate_fn=pad_collate,
+    pin_memory=True)
+
 model = Perceiver(
-    input_channels = 1,          # number of channels for each token of the input - in my case 4 atom chanels
-    input_axis = 2,              # number of axis for input data (2 for images, 3 for video) - in my case 3 dimensional box
+    input_channels = 4,          # number of channels for each token of the input - in my case 4 atom chanels
+    input_axis = 3,              # number of axis for input data (2 for images, 3 for video) - in my case 3 dimensional box
     num_freq_bands = 6,          # number of freq bands, with original value (2 * K + 1)
     max_freq = 10.,              # maximum frequency, hyperparameter depending on how fine the data is
     depth = 6,                   # depth of net. The shape of the final attention mechanism will be:
@@ -60,7 +74,7 @@ model = Perceiver(
     latent_heads = 8,            # number of heads for latent self attention, 8
     cross_dim_head = 64,         # number of dimensions per cross attention head
     latent_dim_head = 64,        # number of dimensions per latent self attention head
-    num_classes = 1000,          # output number of classes
+    num_classes = N_CLASSES,          # output number of classes
     attn_dropout = 0.,
     ff_dropout = 0.,
     weight_tie_layers = False,   # whether to weight tie layers (optional, as indicated in the diagram)
@@ -68,22 +82,125 @@ model = Perceiver(
     self_per_cross_attn = 2      # number of self attention blocks per cross attention
 )
 
-# example file
-pdb_files = [f for f in os.listdir(pdb_files_path) if f.endswith('pdb.gz')]
-example_file_name = np.random.choice(pdb_files)
-example_file = os.path.join(pdb_files_path, example_file_name)
-MICRO_BOX_SIZE = 15
+# Hyper parameters
+LEARNING_RATE = 0.001
+WEIGHT_DECAY = 1e-4
+PATIENCE = 0.01
+NUM_EPOCHS = 3000
+
+# training loop
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
+train_loss, test_loss = [], []
+
+early_stopping = EarlyStopping(patience=PATIENCE)
+summary = []
+for epoch in range(NUM_EPOCHS):
+    batch_loss = 0
+    model.train()
+    for i, (x_train, y_train, _, _) in enumerate(train_loader):
+        # attach to device
+        x_train = x_train.to(device)
+        y_train = y_train.to(device).reshape([len(x_train), -1])
+        optimizer.zero_grad()
+
+        # forward + backward + optimize
+        outputs = model(x_train)
+        loss = criterion(outputs, y_train)
+        loss.backward()
+        optimizer.step()
+        batch_loss += loss.data
+    train_loss.append(batch_loss / len(train_loader))
+
+    batch_loss = 0
+    model.eval()
+    for x_test, y_test in test_loader:
+        # attach to device
+        x_test = x_test.to(device)
+        y_test = y_test.to(device).reshape([len(x_test), -1])
+
+        pred = model(x_test)
+        loss = criterion(pred, y_test)
+        batch_loss += loss.data
+
+    test_loss.append(batch_loss / len(test_loader))
+
+    if epoch % (NUM_EPOCHS // 10) == 0:
+        summary.append('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
+        print('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
+
+    if invoke(early_stopping, test_loss[-1], model, implement=True):
+        model.load_state_dict(torch.load('checkpoint.pt'))
+        summary.append(f'Early stopping after {epoch} epochs')
+        break
+
+    train_loss.append(train_loss)
+    test_loss.append(test_loss)
+    torch.save(model.state_dict(), os.path.join(script_path, f'../results/09_voxel_perceiver'))
+
+# performance evaluation
+def plot_losses(train_loss, test_loss, i,burn_in=20):
+    plt.figure(figsize=(15, 4))
+    plt.plot(list(range(burn_in, len(train_loss))), train_loss[burn_in:], label='Training loss')
+    plt.plot(list(range(burn_in, len(test_loss))), test_loss[burn_in:], label='Test loss')
+
+    # find position of lowest testation loss
+    minposs = test_loss.index(min(test_loss)) + 1
+    plt.axvline(minposs, linestyle='--', color='r', label='Minimum Test Loss')
+
+    plt.legend(frameon=False)
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.savefig(os.path.join(script_path, f'../results/09_losses_{i}'))
+    plt.close()
 
 
-# # get atom boxes
-# atom_boxes = np.expand_dims(atom_boxes, axis=0)
-# atom_boxes = torch.from_numpy(atom_boxes)
-#
-# print(atom_boxes.shape)
-# #atom_boxes = torch.randn(1, 512, 512, 2, 4)
-# print(model(atom_boxes))
-# print(model(atom_boxes).shape)
-#
-# #img = torch.randn(1, 224, 224, 3) # 1 imagenet image, pixelized
-#
-# #model(img) # (1, 1000)
+train_loss = [x.detach().cpu().numpy() for x in train_loss]
+test_loss = [x.detach().cpu().numpy() for x in test_loss]
+plot_losses(train_loss, test_loss, i)
+
+with torch.no_grad():
+    n_points = valid_loader.batch_size
+    i = 0
+    y_predictions = np.zeros(n_points)
+
+    model.eval()
+
+    for x_valid, y_valid in valid_loader:
+        # attach to device
+        x_valid = x_valid.to(device)
+        y_valid = y_valid.to(device).reshape([len(y_valid), -1])
+
+        pred = model(x_valid)
+        y_predictions = pred.detach().cpu().numpy()
+        loss = criterion(pred, y_valid)
+        i += 1
+
+    CLASS_THRESHOLD = 0.5
+    y_pred_class = np.zeros(n_points)
+    for pred in enumerate(y_predictions):
+        y_pred_class[i] = [1 if x >= CLASS_THRESHOLD else 0 for x in pred]
+
+    y_valid_class = np.where(y_valid.detach().cpu().numpy().flatten() >= CLASS_THRESHOLD, 1, 0)
+
+
+mcc = matthews_corrcoef(y_valid_class, y_pred_class)
+summary.append('\nmathews correlation coefficient: ' + str(mcc))
+print(mcc)
+
+# ROC and AUC
+fpr, tpr, threshold = roc_curve(y_valid_class, y_pred_class)
+roc_auc = auc(fpr, tpr)
+
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, label=f'AUC = {roc_auc}')
+plt.legend(loc='best')
+plt.plot(linestyle='--')
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.savefig(os.path.join(script_path, f'../results/09_roc.png'))
+plt.close()
+
+with open(os.path.join(script_path, '../results/09_summary.txt'), 'w') as f:
+    for line in summary:
+        f.write(str(line) + '\n')
