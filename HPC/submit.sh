@@ -40,5 +40,6 @@ pip install tqdm
 pip install biopython
 pip install requests
 pip3 install -U scikit-learn
+pip install perceiver-pytorch
 
 python3 /zhome/4c/8/164840/projects/ERxn/scripts/09_perceiver.py
