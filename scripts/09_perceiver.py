@@ -98,14 +98,15 @@ optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, weight_decay=W
 train_loss, test_loss = [], []
 
 early_stopping = EarlyStopping(patience=PATIENCE)
+
 summary = []
 for epoch in range(NUM_EPOCHS):
     batch_loss = 0
     model.train()
     for i, (x_train, y_train, _, _) in enumerate(train_loader):
         # attach to device
-        x_train = x_train.cuda(non_blocking=PIN_MEMORY)
-        y_train = y_train.reshape([len(x_train), -1]).cuda(non_blocking=PIN_MEMORY)
+        x_train = x_train.to(device)
+        y_train = y_train.to(device).reshape([len(x_train), -1])
         optimizer.zero_grad()
 
         # forward + backward + optimize
