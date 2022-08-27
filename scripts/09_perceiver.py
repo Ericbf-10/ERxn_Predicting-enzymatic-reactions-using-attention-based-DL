@@ -10,6 +10,7 @@ sys.path.append('functions/')
 from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, collate_voxels
 from functions.customDataset import point_cloud_dataset, voxel_dataset
 from sklearn.metrics import roc_curve, auc, matthews_corrcoef
+import time
 
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
@@ -101,6 +102,7 @@ train_loss, test_loss = [], []
 early_stopping = EarlyStopping(patience=PATIENCE)
 
 summary = []
+start = time.time()
 for epoch in range(NUM_EPOCHS):
     batch_loss = 0
     model.train()
@@ -117,6 +119,27 @@ for epoch in range(NUM_EPOCHS):
         loss.backward()
         optimizer.step()
         batch_loss += loss.data
+
+        if i == 100:
+            with open(os.path.join(results_dir, f'epoch_{epoch}_100_samples.txt'), 'w') as f:
+                f.write(f'{start-time.time()}')
+
+        if i == 1000:
+            with open(os.path.join(results_dir, f'epoch_{epoch}_1000_samples.txt'), 'w') as f:
+                f.write(f'{start-time.time()}')
+
+        if i == 10000:
+            with open(os.path.join(results_dir, f'epoch_{epoch}_10000_samples.txt'), 'w') as f:
+                f.write(f'{start-time.time()}')
+
+        if i == 20000:
+            with open(os.path.join(results_dir, f'epoch_{epoch}_20000_samples.txt'), 'w') as f:
+                f.write(f'{start-time.time()}')
+
+        if i == 50000:
+            with open(os.path.join(results_dir, f'epoch_{epoch}_50000_samples.txt'), 'w') as f:
+                f.write(f'{start-time.time()}')
+
     train_loss.append(batch_loss / len(train_loader))
 
     batch_loss = 0
