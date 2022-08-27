@@ -18,8 +18,8 @@ pdb_files_path = os.path.join(data_dir, 'pdbs')
 point_cloud_path = os.path.join(data_dir, 'point_cloud_dataset')
 
 # Choose data set
-#dataset_path = os.path.join(data_dir, 'datasets/08_point_cloud_dataset.csv')
-dataset_path = os.path.join(data_dir, 'datasets/07_pdb_EC_dataset.csv')
+dataset_path = os.path.join(data_dir, 'datasets/08_point_cloud_dataset.csv')
+#dataset_path = os.path.join(data_dir, 'datasets/07_pdb_EC_dataset.csv')
 
 # use GPU if available
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -39,9 +39,9 @@ validation_data = dataset.drop(training_data.index).drop(test_data.index)
 
 # dataset and data loader
 #train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
-train = voxel_dataset(df=training_data)
-test = voxel_dataset(df=test_data)
-valid = voxel_dataset(df=validation_data)
+train = voxel_dataset(df=training_data, point_cloud_path=point_cloud_path)
+test = voxel_dataset(df=test_data, point_cloud_path=point_cloud_path)
+valid = voxel_dataset(df=validation_data, point_cloud_path=point_cloud_path)
 
 train_loader = torch.utils.data.DataLoader(
     train,
