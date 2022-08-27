@@ -7,7 +7,7 @@ import torch.nn as nn
 from perceiver_pytorch import Perceiver
 import sys
 sys.path.append('functions/')
-from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, pad_collate
+from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, collate_voxels
 from functions.customDataset import point_cloud_dataset, voxel_dataset
 from sklearn.metrics import roc_curve, auc, matthews_corrcoef
 
@@ -16,10 +16,13 @@ data_dir = os.path.join(script_path, '../data')
 processed_data_dir = os.path.join(data_dir, 'processed')
 pdb_files_path = os.path.join(data_dir, 'pdbs')
 point_cloud_path = os.path.join(data_dir, 'point_cloud_dataset')
+results_dir = os.path.join(script_path, '../results')
+
+if not os.path.exists(results_dir):
+    os.makedirs(results_dir)
 
 # Choose data set
 dataset_path = os.path.join(data_dir, 'datasets/08_point_cloud_dataset.csv')
-#dataset_path = os.path.join(data_dir, 'datasets/07_pdb_EC_dataset.csv')
 
 # use GPU if available
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -31,11 +34,17 @@ dataset = pd.read_csv(dataset_path)
 dataset['y'] = one_hot_encoder(dataset['EC'].to_list())
 N_CLASSES = len(dataset['y'][0])
 
-# 80 - 15 - 5 split
-training_data = dataset.sample(frac=0.8)
-test_data = dataset.drop(training_data.index).sample(frac=0.15)
+# 80 - 15 - 5 split - with random seed
+training_data = dataset.sample(frac=0.8, random_state=1)
+test_data = dataset.drop(training_data.index).sample(frac=0.15, random_state=1)
 validation_data = dataset.drop(training_data.index).drop(test_data.index)
 
+# Hyper parameters
+LEARNING_RATE = 0.001
+WEIGHT_DECAY = 1e-4
+PATIENCE = 0.01
+NUM_EPOCHS = 3000
+BATCH_SIZE = 64
 
 # dataset and data loader
 #train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
@@ -45,20 +54,20 @@ valid = voxel_dataset(df=validation_data, point_cloud_path=point_cloud_path)
 
 train_loader = torch.utils.data.DataLoader(
     train,
-    batch_size=2,
-    collate_fn=pad_collate,
+    batch_size=BATCH_SIZE,
+    collate_fn=collate_voxels,
     pin_memory=True)
 
 test_loader = torch.utils.data.DataLoader(
     test,
     batch_size=len(test),
-    collate_fn=pad_collate,
+    collate_fn=collate_voxels,
     pin_memory=True)
 
 valid_loader = torch.utils.data.DataLoader(
     valid,
     batch_size=len(valid),
-    collate_fn=pad_collate,
+    collate_fn=collate_voxels,
     pin_memory=True)
 
 model = Perceiver(
@@ -81,12 +90,6 @@ model = Perceiver(
     fourier_encode_data = True,  # whether to auto-fourier encode the data, using the input_axis given. defaults to True, but can be turned off if you are fourier encoding the data yourself
     self_per_cross_attn = 2      # number of self attention blocks per cross attention
 )
-
-# Hyper parameters
-LEARNING_RATE = 0.001
-WEIGHT_DECAY = 1e-4
-PATIENCE = 0.01
-NUM_EPOCHS = 3000
 
 # training loop
 criterion = nn.CrossEntropyLoss()
@@ -136,7 +139,7 @@ for epoch in range(NUM_EPOCHS):
 
     train_loss.append(train_loss)
     test_loss.append(test_loss)
-    torch.save(model.state_dict(), os.path.join(script_path, f'../results/09_voxel_perceiver'))
+    torch.save(model.state_dict(), os.path.join(results_dir, f'09_voxel_perceiver'))
 
 # performance evaluation
 def plot_losses(train_loss, test_loss, i,burn_in=20):
@@ -151,13 +154,13 @@ def plot_losses(train_loss, test_loss, i,burn_in=20):
     plt.legend(frameon=False)
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
-    plt.savefig(os.path.join(script_path, f'../results/09_losses_{i}'))
+    plt.savefig(os.path.join(results_dir, f'09_losses'))
     plt.close()
 
 
 train_loss = [x.detach().cpu().numpy() for x in train_loss]
 test_loss = [x.detach().cpu().numpy() for x in test_loss]
-plot_losses(train_loss, test_loss, i)
+plot_losses(train_loss, test_loss)
 
 with torch.no_grad():
     n_points = valid_loader.batch_size
@@ -198,9 +201,9 @@ plt.legend(loc='best')
 plt.plot(linestyle='--')
 plt.ylabel('True Positive Rate')
 plt.xlabel('False Positive Rate')
-plt.savefig(os.path.join(script_path, f'../results/09_roc.png'))
+plt.savefig(os.path.join(results_dir, f'09_roc.png'))
 plt.close()
 
-with open(os.path.join(script_path, '../results/09_summary.txt'), 'w') as f:
+with open(os.path.join(results_dir, '09_summary.txt'), 'w') as f:
     for line in summary:
         f.write(str(line) + '\n')

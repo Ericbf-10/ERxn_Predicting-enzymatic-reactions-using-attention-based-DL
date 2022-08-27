@@ -1,7 +1,6 @@
 import numpy as np
 import torch
-from torch.nn.utils.rnn import pad_sequence
-import torch.nn.functional as F
+from torch.nn.utils.rnn import pack_sequence
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -93,17 +92,14 @@ def one_hot_encoder(y_list):
 
     return encoded_ys
 
-from torch.nn.utils.rnn import pack_sequence
-from torch.utils.data import DataLoader
-
-def my_collate(batch):
+def collate_point_cloud(batch):
     # batch contains a list of tuples of structure (sequence, target)
     data = [item[0] for item in batch]
     data = pack_sequence(data, enforce_sorted=False)
     targets = [item[1] for item in batch]
     return [data, targets]
 
-def pad_collate(batch):
+def collate_voxels(batch):
     (xx, yy) = zip(*batch)
     x_lens = [x.shape for x in xx]
     y_lens = [y.shape for y in yy]

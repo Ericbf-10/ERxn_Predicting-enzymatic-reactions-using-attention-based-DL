@@ -39,4 +39,4 @@ pip install tqdm
 pip install biopython
 pip install requests
 
-python3 /zhome/4c/8/164840/projects/ERxn/scripts/07_protein_voxelization_dataset.py
+python3 /zhome/4c/8/164840/projects/ERxn/scripts/09_perceiver.py
