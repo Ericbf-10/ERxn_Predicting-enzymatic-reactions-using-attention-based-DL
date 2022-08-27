@@ -90,7 +90,7 @@ model = Perceiver(
     weight_tie_layers = False,   # whether to weight tie layers (optional, as indicated in the diagram)
     fourier_encode_data = True,  # whether to auto-fourier encode the data, using the input_axis given. defaults to True, but can be turned off if you are fourier encoding the data yourself
     self_per_cross_attn = 2      # number of self attention blocks per cross attention
-)
+).to(device)
 
 # training loop
 criterion = nn.CrossEntropyLoss()
