@@ -114,7 +114,7 @@ def collate_voxels(batch):
         target[:x.shape[0],:x.shape[1],:x.shape[2],:] = x
         xx_pad.append(target)
 
-    yy_pad = torch.stack(yy).type(torch.FloatTensor).to(device)
-    xx_pad = torch.stack(xx_pad).to(device)
+    yy_pad = torch.stack(yy).type(torch.FloatTensor).cuda(non_blocking=True)
+    xx_pad = torch.stack(xx_pad).cuda(non_blocking=True)
 
     return xx_pad, yy_pad, x_lens, y_lens
