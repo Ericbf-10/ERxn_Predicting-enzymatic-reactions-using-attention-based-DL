@@ -2,7 +2,9 @@ import numpy as np
 import torch
 from torch.nn.utils.rnn import pack_sequence
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# voxels to big
+#device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 
 def invoke(early_stopping, loss, model, implement=False):
     if implement == False:
