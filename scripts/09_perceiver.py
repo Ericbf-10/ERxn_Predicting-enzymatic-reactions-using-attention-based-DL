@@ -44,7 +44,7 @@ LEARNING_RATE = 0.001
 WEIGHT_DECAY = 1e-4
 PATIENCE = 0.01
 NUM_EPOCHS = 3000
-BATCH_SIZE = 64
+BATCH_SIZE = 10
 
 # dataset and data loader
 #train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
