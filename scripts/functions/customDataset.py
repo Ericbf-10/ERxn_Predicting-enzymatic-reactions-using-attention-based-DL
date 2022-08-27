@@ -4,8 +4,6 @@ from torch.utils.data import Dataset
 import gzip
 import matplotlib.pyplot as plt
 
-
-
 def get_protein_voxels(point_cloud, plot=False):
     '''
     takes a pdb file and saves the atom coordinates of carbon, oxygen,
