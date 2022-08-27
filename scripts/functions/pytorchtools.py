@@ -112,10 +112,10 @@ def collate_voxels(batch):
     for x in xx:
         target = torch.zeros(x_max, y_max, z_max, 4)
         target[:x.shape[0],:x.shape[1],:x.shape[2],:] = x
-        target = target + (0.1**0.5)*torch.randn(target.shape)
+        #target = target + (0.1**0.5)*torch.randn(target.shape)
         xx_pad.append(target)
 
-    yy_pad = torch.stack(yy).type(torch.FloatTensor).to(device)
+    yy_pad = torch.stack(yy).to(device)
     xx_pad = torch.stack(xx_pad).to(device)
 
     return xx_pad, yy_pad, x_lens, y_lens
