@@ -44,7 +44,7 @@ LEARNING_RATE = 0.001
 WEIGHT_DECAY = 1e-4
 PATIENCE = 0.01
 NUM_EPOCHS = 3000
-BATCH_SIZE = 5
+BATCH_SIZE = 1
 PIN_MEMORY = False
 
 # dataset and data loader
