@@ -24,8 +24,9 @@ if not os.path.exists(results_dir):
 # Choose data set
 dataset_path = os.path.join(data_dir, 'datasets/08_point_cloud_dataset.csv')
 
-# use GPU if available
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# use GPU if available - my data is to big
+#device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 
 # load dataset
 dataset = pd.read_csv(dataset_path)
