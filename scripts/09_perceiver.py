@@ -26,8 +26,8 @@ if not os.path.exists(results_dir):
 dataset_path = os.path.join(data_dir, 'datasets/08_point_cloud_dataset.csv')
 
 # use GPU if available - my data is to big
-#device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device = torch.device('cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+#device = torch.device('cpu')
 
 # load dataset
 dataset = pd.read_csv(dataset_path)
@@ -122,23 +122,23 @@ for epoch in range(NUM_EPOCHS):
 
         if i == 100:
             with open(os.path.join(results_dir, f'epoch_{epoch}_100_samples.txt'), 'w') as f:
-                f.write(f'{start-time.time()}')
+                f.write(f'{time.time()-start}')
 
         if i == 1000:
             with open(os.path.join(results_dir, f'epoch_{epoch}_1000_samples.txt'), 'w') as f:
-                f.write(f'{start-time.time()}')
+                f.write(f'{time.time()-start}')
 
         if i == 10000:
             with open(os.path.join(results_dir, f'epoch_{epoch}_10000_samples.txt'), 'w') as f:
-                f.write(f'{start-time.time()}')
+                f.write(f'{time.time()-start}')
 
         if i == 20000:
             with open(os.path.join(results_dir, f'epoch_{epoch}_20000_samples.txt'), 'w') as f:
-                f.write(f'{start-time.time()}')
+                f.write(f'{time.time()-start}')
 
         if i == 50000:
             with open(os.path.join(results_dir, f'epoch_{epoch}_50000_samples.txt'), 'w') as f:
-                f.write(f'{start-time.time()}')
+                f.write(f'{time.time()-start}')
 
     train_loss.append(batch_loss / len(train_loader))
 

@@ -3,8 +3,8 @@ import torch
 from torch.nn.utils.rnn import pack_sequence
 
 # voxels to big
-#device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device = torch.device('cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+#device = torch.device('cpu')
 
 def invoke(early_stopping, loss, model, implement=False):
     if implement == False:
@@ -115,14 +115,14 @@ def collate_voxels(batch):
     for i in range(len(xx)):
         x = xx[i]
         y = yy[i]
-        target = torch.zeros(x_max, y_max, z_max, 4).type(torch.float32)
-        target[:x.shape[0],:x.shape[1],:x.shape[2],:] = x.type(torch.float32)
+        target = torch.zeros(x_max, y_max, z_max, 4).type(torch.float16)
+        target[:x.shape[0],:x.shape[1],:x.shape[2],:] = x.type(torch.float16)
         xx_pad.append(target.to(device))
         yy_pad.append(y.float().to(device))
         #target = target + (0.1**0.5)*torch.randn(target.shape)
 
 
-    yy_pad = torch.stack(yy).type(torch.float32).to(device)
+    yy_pad = torch.stack(yy).type(torch.float16).to(device)
     xx_pad = torch.stack(xx_pad).to(device)
 
     return xx_pad, yy_pad, x_lens, y_lens
