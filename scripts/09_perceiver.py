@@ -113,9 +113,9 @@ for epoch in range(NUM_EPOCHS):
         optimizer.zero_grad()
 
         # forward + backward + optimize
-        outputs = model(x_train).type(torch.float16)
+        outputs = model(x_train)
         x_train.detach()
-        loss = criterion(outputs, y_train)
+        loss = criterion(outputs.type(torch.float16), y_train.type(torch.float16))
         loss.backward()
         optimizer.step()
         batch_loss += loss.data
