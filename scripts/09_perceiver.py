@@ -111,10 +111,10 @@ for epoch in range(NUM_EPOCHS):
         x_train = x_train.to(device)
         y_train = y_train.to(device).reshape([len(x_train), -1])
         optimizer.zero_grad()
-        x_train.detach()
 
         # forward + backward + optimize
-        outputs = model(x_train)
+        outputs = model(x_train).type(torch.float16)
+        x_train.detach()
         loss = criterion(outputs, y_train)
         loss.backward()
         optimizer.step()
