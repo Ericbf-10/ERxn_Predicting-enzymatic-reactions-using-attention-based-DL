@@ -13,8 +13,6 @@ def get_protein_voxels(point_cloud, plot=False):
     ys = []
     zs = []
     atom_types = []
-    CAs = []
-    atoms = ['C', 'O', 'N', 'S', 'CA']
     point_cloud = np.loadtxt(point_cloud)
     for point in point_cloud:
         xs.append(int(point[0]))

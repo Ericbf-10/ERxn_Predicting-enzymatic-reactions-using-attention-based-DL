@@ -9,7 +9,7 @@ import sys
 sys.path.append('functions/')
 from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, collate_voxels
 from functions.customDataset import point_cloud_dataset, voxel_dataset
-from sklearn.metrics import roc_curve, auc, matthews_corrcoef
+from sklearn.metrics import matthews_corrcoef, roc_curve, auc
 import time
 
 script_path = os.path.dirname(__file__)
@@ -30,22 +30,25 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 #device = torch.device('cpu')
 
 # load dataset
-dataset = pd.read_csv(dataset_path)
+dataset = pd.read_csv(dataset_path).sample(n=5)
 
 # one hot encoding of y-values
 dataset['y'] = one_hot_encoder(dataset['EC'].to_list())
-N_CLASSES = len(dataset['y'][0])
+N_CLASSES = len(dataset['y'].to_list()[0])
 
 # 80 - 15 - 5 split - with random seed
-training_data = dataset.sample(frac=0.8, random_state=1)
-test_data = dataset.drop(training_data.index).sample(frac=0.15, random_state=1)
+#training_data = dataset.sample(frac=0.8, random_state=1)
+#test_data = dataset.drop(training_data.index).sample(frac=0.15, random_state=1)
+#validation_data = dataset.drop(training_data.index).drop(test_data.index)
+training_data = dataset.sample(n=1, random_state=1)
+test_data = dataset.drop(training_data.index).sample(n=1, random_state=1)
 validation_data = dataset.drop(training_data.index).drop(test_data.index)
 
 # Hyper parameters
 LEARNING_RATE = 0.001
 WEIGHT_DECAY = 1e-4
 PATIENCE = 0.01
-NUM_EPOCHS = 3000
+NUM_EPOCHS = 2
 BATCH_SIZE = 1
 PIN_MEMORY = False
 
@@ -63,13 +66,13 @@ train_loader = torch.utils.data.DataLoader(
 
 test_loader = torch.utils.data.DataLoader(
     test,
-    batch_size=len(test),
+    batch_size=BATCH_SIZE,
     collate_fn=collate_voxels,
     pin_memory=PIN_MEMORY)
 
 valid_loader = torch.utils.data.DataLoader(
     valid,
-    batch_size=len(valid),
+    batch_size=BATCH_SIZE,
     collate_fn=collate_voxels,
     pin_memory=PIN_MEMORY)
 
@@ -115,10 +118,11 @@ for epoch in range(NUM_EPOCHS):
         # forward + backward + optimize
         outputs = model(x_train)
         x_train.detach()
-        loss = criterion(outputs.type(torch.float16), y_train.type(torch.float16))
+        loss = criterion(outputs, y_train)
         loss.backward()
         optimizer.step()
         batch_loss += loss.data
+        print(i)
 
         if i == 100:
             with open(os.path.join(results_dir, f'epoch_{epoch}_100_samples.txt'), 'w') as f:
@@ -144,7 +148,7 @@ for epoch in range(NUM_EPOCHS):
 
     batch_loss = 0
     model.eval()
-    for x_test, y_test in test_loader:
+    for i, (x_test, y_test, _, _) in enumerate(test_loader):
         # attach to device
         x_test = x_test.to(device)
         y_test = y_test.to(device).reshape([len(x_test), -1])
@@ -155,21 +159,22 @@ for epoch in range(NUM_EPOCHS):
 
     test_loss.append(batch_loss / len(test_loader))
 
-    if epoch % (NUM_EPOCHS // 10) == 0:
-        summary.append('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
-        print('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
+    # turn if condition on for real run
+    #if epoch % (NUM_EPOCHS // 10) == 0:
+    summary.append('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
+    print('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
 
     if invoke(early_stopping, test_loss[-1], model, implement=True):
         model.load_state_dict(torch.load('checkpoint.pt'))
         summary.append(f'Early stopping after {epoch} epochs')
         break
 
-    train_loss.append(train_loss)
-    test_loss.append(test_loss)
+    #train_loss.append(train_loss)
+    #test_loss.append(test_loss)
     torch.save(model.state_dict(), os.path.join(results_dir, f'09_voxel_perceiver'))
 
 # performance evaluation
-def plot_losses(train_loss, test_loss, i,burn_in=20):
+def plot_losses(train_loss, test_loss,burn_in=20):
     plt.figure(figsize=(15, 4))
     plt.plot(list(range(burn_in, len(train_loss))), train_loss[burn_in:], label='Training loss')
     plt.plot(list(range(burn_in, len(test_loss))), test_loss[burn_in:], label='Test loss')
@@ -189,48 +194,40 @@ train_loss = [x.detach().cpu().numpy() for x in train_loss]
 test_loss = [x.detach().cpu().numpy() for x in test_loss]
 plot_losses(train_loss, test_loss)
 
+# TODO: get validation
 with torch.no_grad():
-    n_points = valid_loader.batch_size
-    i = 0
-    y_predictions = np.zeros(n_points)
+    n_points = len(validation_data)
+
+    y_class_pred = np.zeros(n_points)
+    y_valid_class = np.zeros(n_points)
 
     model.eval()
-
-    for x_valid, y_valid in valid_loader:
+    for i, (x_valid, y_valid, _, _) in enumerate(valid_loader):
         # attach to device
         x_valid = x_valid.to(device)
         y_valid = y_valid.to(device).reshape([len(y_valid), -1])
 
         pred = model(x_valid)
-        y_predictions = pred.detach().cpu().numpy()
-        loss = criterion(pred, y_valid)
-        i += 1
+        y_class_pred[i] = pred.detach().cpu().numpy().argmax()
+        y_valid_class[i] = y_valid.detach().cpu().numpy().argmax()
 
-    CLASS_THRESHOLD = 0.5
-    y_pred_class = np.zeros(n_points)
-    for pred in enumerate(y_predictions):
-        y_pred_class[i] = [1 if x >= CLASS_THRESHOLD else 0 for x in pred]
-
-    y_valid_class = np.where(y_valid.detach().cpu().numpy().flatten() >= CLASS_THRESHOLD, 1, 0)
-
-
-mcc = matthews_corrcoef(y_valid_class, y_pred_class)
+mcc = matthews_corrcoef(y_valid_class, y_class_pred)
 summary.append('\nmathews correlation coefficient: ' + str(mcc))
 print(mcc)
-
-# ROC and AUC
-fpr, tpr, threshold = roc_curve(y_valid_class, y_pred_class)
-roc_auc = auc(fpr, tpr)
-
-plt.title('Receiver Operating Characteristic')
-plt.plot(fpr, tpr, label=f'AUC = {roc_auc}')
-plt.legend(loc='best')
-plt.plot(linestyle='--')
-plt.ylabel('True Positive Rate')
-plt.xlabel('False Positive Rate')
-plt.savefig(os.path.join(results_dir, f'09_roc.png'))
-plt.close()
 
 with open(os.path.join(results_dir, '09_summary.txt'), 'w') as f:
     for line in summary:
         f.write(str(line) + '\n')
+
+# ROC and AUC (not available for multi class?)
+#fpr, tpr, threshold = roc_curve(y_valid_class, y_class_pred)
+#roc_auc = auc(fpr, tpr)
+
+#plt.title('Receiver Operating Characteristic')
+#plt.plot(fpr, tpr, label=f'AUC = {roc_auc}')
+#plt.legend(loc='best')
+#plt.plot(linestyle='--')
+#plt.ylabel('True Positive Rate')
+#plt.xlabel('False Positive Rate')
+#plt.savefig(os.path.join(results_dir, f'09_roc.png'))
+#plt.close()
