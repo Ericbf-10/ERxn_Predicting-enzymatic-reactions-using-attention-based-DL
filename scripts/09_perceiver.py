@@ -12,6 +12,8 @@ from functions.customDataset import point_cloud_dataset, voxel_dataset
 from sklearn.metrics import matthews_corrcoef, roc_curve, auc
 import time
 
+VOXEL_DATA = False # true for voxels, false for point clouds
+
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
 processed_data_dir = os.path.join(data_dir, 'processed')
@@ -37,12 +39,12 @@ dataset['y'] = one_hot_encoder(dataset['EC'].to_list())
 N_CLASSES = len(dataset['y'].to_list()[0])
 
 # 80 - 15 - 5 split - with random seed
-#training_data = dataset.sample(frac=0.8, random_state=1)
-#test_data = dataset.drop(training_data.index).sample(frac=0.15, random_state=1)
-#validation_data = dataset.drop(training_data.index).drop(test_data.index)
-training_data = dataset.sample(n=1, random_state=1)
-test_data = dataset.drop(training_data.index).sample(n=1, random_state=1)
+training_data = dataset.sample(frac=0.8, random_state=1)
+test_data = dataset.drop(training_data.index).sample(frac=0.15, random_state=1)
 validation_data = dataset.drop(training_data.index).drop(test_data.index)
+# training_data = dataset.sample(n=1, random_state=1)
+# test_data = dataset.drop(training_data.index).sample(n=1, random_state=1)
+# validation_data = dataset.drop(training_data.index).drop(test_data.index)
 
 # Hyper parameters
 LEARNING_RATE = 0.001
@@ -54,9 +56,18 @@ PIN_MEMORY = False
 
 # dataset and data loader
 #train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
-train = voxel_dataset(df=training_data, point_cloud_path=point_cloud_path)
-test = voxel_dataset(df=test_data, point_cloud_path=point_cloud_path)
-valid = voxel_dataset(df=validation_data, point_cloud_path=point_cloud_path)
+if VOXEL_DATA:
+    train = voxel_dataset(df=training_data, point_cloud_path=point_cloud_path)
+    test = voxel_dataset(df=test_data, point_cloud_path=point_cloud_path)
+    valid = voxel_dataset(df=validation_data, point_cloud_path=point_cloud_path)
+    INPUT_CHANNELS = 4
+    INPUT_AXIS = 3
+else:
+    train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
+    test = point_cloud_dataset(df=test_data, point_cloud_path=point_cloud_path)
+    valid = point_cloud_dataset(df=validation_data, point_cloud_path=point_cloud_path)
+    INPUT_CHANNELS = 1
+    INPUT_AXIS = 2
 
 train_loader = torch.utils.data.DataLoader(
     train,
@@ -76,9 +87,10 @@ valid_loader = torch.utils.data.DataLoader(
     collate_fn=collate_voxels,
     pin_memory=PIN_MEMORY)
 
+
 model = Perceiver(
-    input_channels = 4,          # number of channels for each token of the input - in my case 4 atom chanels
-    input_axis = 3,              # number of axis for input data (2 for images, 3 for video) - in my case 3 dimensional box
+    input_channels = INPUT_CHANNELS,          # number of channels for each token of the input - in my case 4 atom chanels
+    input_axis = INPUT_AXIS,              # number of axis for input data (2 for images, 3 for video) - in my case 3 dimensional box
     num_freq_bands = 6,          # number of freq bands, with original value (2 * K + 1)
     max_freq = 10.,              # maximum frequency, hyperparameter depending on how fine the data is
     depth = 6,                   # depth of net. The shape of the final attention mechanism will be:

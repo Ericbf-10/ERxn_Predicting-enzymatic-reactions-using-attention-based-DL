@@ -101,26 +101,34 @@ def collate_point_cloud(batch):
     targets = [item[1] for item in batch]
     return [data, targets]
 
-def collate_voxels(batch, add_noise=False):
+def collate_voxels(batch, add_noise=False, VOXEL_DATA=False):
+    # TODO: test for point cloud representation
     (xx, yy) = zip(*batch)
     x_lens = [x.shape for x in xx]
     y_lens = [y.shape for y in yy]
 
     x_max = max([x[0] for x in x_lens])
     y_max = max([y[1] for y in x_lens])
-    z_max = max([z[2] for z in x_lens])
+    if VOXEL_DATA:
+        z_max = max([z[2] for z in x_lens])
 
     xx_pad = []
     yy_pad = []
     for i in range(len(xx)):
         x = xx[i]
         y = yy[i]
-        target = torch.zeros(x_max, y_max, z_max, 4)
-        target[:x.shape[0],:x.shape[1],:x.shape[2],:] = x
+        if VOXEL_DATA:
+            target = torch.zeros(x_max, y_max, z_max, 4)
+            target[:x.shape[0],:x.shape[1],:x.shape[2],:] = x
+        else:
+            x = torch.t(x)
+            target = torch.zeros(y_max, x_max)
+            target[:x.shape[0], :x.shape[1]] = x[:,:]
+            target = target[:,:,None]
         xx_pad.append(target.to(device))
         yy_pad.append(y.to(device))
 
-        # Not tested yet!
+        # TODO: test
         if add_noise:
             target = target + (0.1**0.5)*torch.randn(target.shape)
 
