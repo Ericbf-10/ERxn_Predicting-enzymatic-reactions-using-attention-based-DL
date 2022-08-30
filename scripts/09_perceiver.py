@@ -27,9 +27,8 @@ if not os.path.exists(results_dir):
 # Choose data set
 dataset_path = os.path.join(data_dir, 'datasets/08_point_cloud_dataset.csv')
 
-# use GPU if available - my data is to big
+# use GPU if available
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-#device = torch.device('cpu')
 
 # load dataset
 dataset = pd.read_csv(dataset_path).sample(n=5)
@@ -49,9 +48,9 @@ validation_data = dataset.drop(training_data.index).drop(test_data.index)
 # Hyper parameters
 LEARNING_RATE = 0.001
 WEIGHT_DECAY = 1e-4
-PATIENCE = 0.01
-NUM_EPOCHS = 2
-BATCH_SIZE = 1
+NUM_EPOCHS = 10000
+PATIENCE = 0.01 * NUM_EPOCHS
+BATCH_SIZE = 64
 PIN_MEMORY = False
 
 # dataset and data loader
@@ -204,7 +203,6 @@ train_loss = [x.detach().cpu().numpy() for x in train_loss]
 test_loss = [x.detach().cpu().numpy() for x in test_loss]
 plot_losses(train_loss, test_loss)
 
-# TODO: get validation
 with torch.no_grad():
     n_points = len(validation_data)
 

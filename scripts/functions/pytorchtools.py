@@ -4,7 +4,6 @@ from torch.nn.utils.rnn import pack_sequence
 
 # voxels to big
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-#device = torch.device('cpu')
 
 def invoke(early_stopping, loss, model, implement=False):
     if implement == False:
@@ -102,7 +101,6 @@ def collate_point_cloud(batch):
     return [data, targets]
 
 def collate_voxels(batch, add_noise=False, VOXEL_DATA=False):
-    # TODO: test for point cloud representation
     (xx, yy) = zip(*batch)
     x_lens = [x.shape for x in xx]
     y_lens = [y.shape for y in yy]
