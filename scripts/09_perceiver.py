@@ -31,7 +31,7 @@ dataset_path = os.path.join(data_dir, 'datasets/08_point_cloud_dataset.csv')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # load dataset
-dataset = pd.read_csv(dataset_path).sample(n=5)
+dataset = pd.read_csv(dataset_path)
 
 # one hot encoding of y-values
 dataset['y'] = one_hot_encoder(dataset['EC'].to_list())
@@ -133,7 +133,6 @@ for epoch in range(NUM_EPOCHS):
         loss.backward()
         optimizer.step()
         batch_loss += loss.data
-        print(i)
 
         if i == 100:
             with open(os.path.join(results_dir, f'epoch_{epoch}_100_samples.txt'), 'w') as f:
