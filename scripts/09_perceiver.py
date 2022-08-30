@@ -160,17 +160,15 @@ for epoch in range(NUM_EPOCHS):
     test_loss.append(batch_loss / len(test_loader))
 
     # turn if condition on for real run
-    #if epoch % (NUM_EPOCHS // 10) == 0:
-    summary.append('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
-    print('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
+    if epoch % (NUM_EPOCHS // 10) == 0:
+        summary.append('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
+        print('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
 
     if invoke(early_stopping, test_loss[-1], model, implement=True):
         model.load_state_dict(torch.load('checkpoint.pt'))
         summary.append(f'Early stopping after {epoch} epochs')
         break
 
-    #train_loss.append(train_loss)
-    #test_loss.append(test_loss)
     torch.save(model.state_dict(), os.path.join(results_dir, f'09_voxel_perceiver'))
 
 # performance evaluation

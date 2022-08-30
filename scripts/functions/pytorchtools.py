@@ -101,7 +101,7 @@ def collate_point_cloud(batch):
     targets = [item[1] for item in batch]
     return [data, targets]
 
-def collate_voxels(batch):
+def collate_voxels(batch, add_noise=False):
     (xx, yy) = zip(*batch)
     x_lens = [x.shape for x in xx]
     y_lens = [y.shape for y in yy]
@@ -119,7 +119,10 @@ def collate_voxels(batch):
         target[:x.shape[0],:x.shape[1],:x.shape[2],:] = x
         xx_pad.append(target.to(device))
         yy_pad.append(y.to(device))
-        #target = target + (0.1**0.5)*torch.randn(target.shape)
+
+        # Not tested yet!
+        if add_noise:
+            target = target + (0.1**0.5)*torch.randn(target.shape)
 
 
     yy_pad = torch.stack(yy).type(torch.float).to(device)
