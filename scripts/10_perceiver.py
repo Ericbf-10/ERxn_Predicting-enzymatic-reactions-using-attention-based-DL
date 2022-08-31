@@ -135,26 +135,6 @@ for epoch in range(NUM_EPOCHS):
         optimizer.step()
         batch_loss += loss.data
 
-        if i == 100:
-            with open(os.path.join(results_dir, f'epoch_{epoch}_100_samples.txt'), 'w') as f:
-                f.write(f'{time.time()-start}')
-
-        if i == 1000:
-            with open(os.path.join(results_dir, f'epoch_{epoch}_1000_samples.txt'), 'w') as f:
-                f.write(f'{time.time()-start}')
-
-        if i == 10000:
-            with open(os.path.join(results_dir, f'epoch_{epoch}_10000_samples.txt'), 'w') as f:
-                f.write(f'{time.time()-start}')
-
-        if i == 20000:
-            with open(os.path.join(results_dir, f'epoch_{epoch}_20000_samples.txt'), 'w') as f:
-                f.write(f'{time.time()-start}')
-
-        if i == 50000:
-            with open(os.path.join(results_dir, f'epoch_{epoch}_50000_samples.txt'), 'w') as f:
-                f.write(f'{time.time()-start}')
-
     train_loss.append(batch_loss / len(train_loader))
 
     batch_loss = 0

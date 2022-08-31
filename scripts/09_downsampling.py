@@ -33,3 +33,4 @@ down_sampled_ECs = ec_data['EC'].to_list()
 pc_data = pc_data[pc_data['EC'].isin(down_sampled_ECs)]
 
 pc_data.to_csv(os.path.join(datasets_dir, '09_balanced_data_set.csv'), index=False)
+print(pc_data)
