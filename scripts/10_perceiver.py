@@ -42,12 +42,10 @@ N_CLASSES = len(dataset['y'].to_list()[0])
 training_data = dataset.sample(frac=0.8, random_state=1)
 test_data = dataset.drop(training_data.index).sample(frac=0.15, random_state=1)
 validation_data = dataset.drop(training_data.index).drop(test_data.index)
-# training_data = dataset.sample(n=1, random_state=1)
-# test_data = dataset.drop(training_data.index).sample(n=1, random_state=1)
-# validation_data = dataset.drop(training_data.index).drop(test_data.index)
 
 # Hyper parameters
 LEARNING_RATE = 0.001
+WEIGHT_DECAY = 1e-4
 NUM_EPOCHS = 1000
 PATIENCE = 20
 BATCH_SIZE = 10
@@ -159,7 +157,7 @@ for epoch in range(NUM_EPOCHS):
         summary.append(f'Early stopping after {epoch} epochs')
         break
 
-    torch.save(model.state_dict(), os.path.join(results_dir, f'10_voxel_perceiver'))
+    torch.save(model.state_dict(), os.path.join(results_dir, f'10_enzyme_perceiver'))
 
     with open(os.path.join(results_dir, '10_summary.txt'), 'w') as f:
         for line in summary:

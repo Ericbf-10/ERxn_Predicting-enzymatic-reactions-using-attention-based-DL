@@ -136,3 +136,5 @@ dmypy.json
 *.pdb.gz
 *.fasta.gz
 *.txt
+
+10_voxel_perceiver
