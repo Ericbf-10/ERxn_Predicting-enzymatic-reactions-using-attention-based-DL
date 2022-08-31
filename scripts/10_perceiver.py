@@ -48,9 +48,8 @@ validation_data = dataset.drop(training_data.index).drop(test_data.index)
 
 # Hyper parameters
 LEARNING_RATE = 0.001
-WEIGHT_DECAY = 1e-4
-NUM_EPOCHS = 300
-PATIENCE = 0.01 * NUM_EPOCHS
+NUM_EPOCHS = 1000
+PATIENCE = 20
 BATCH_SIZE = 10
 PIN_MEMORY = False
 
@@ -151,7 +150,7 @@ for epoch in range(NUM_EPOCHS):
     test_loss.append(batch_loss / len(test_loader))
 
     # turn if condition on for real run
-    if epoch % (NUM_EPOCHS // 10) == 0:
+    if epoch % (1) == 0:
         summary.append('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
         print('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
 
