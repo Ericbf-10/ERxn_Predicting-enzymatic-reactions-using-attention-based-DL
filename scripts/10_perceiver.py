@@ -160,7 +160,11 @@ for epoch in range(NUM_EPOCHS):
         summary.append(f'Early stopping after {epoch} epochs')
         break
 
-    torch.save(model.state_dict(), os.path.join(results_dir, f'10_voxel_perceiver_{epoch}'))
+    torch.save(model.state_dict(), os.path.join(results_dir, f'10_voxel_perceiver'))
+
+    with open(os.path.join(results_dir, '10_summary.txt'), 'w') as f:
+        for line in summary:
+            f.write(str(line) + '\n')
 
 # performance evaluation
 def plot_losses(train_loss, test_loss,burn_in=20):
