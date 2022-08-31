@@ -17,12 +17,6 @@ if not os.path.exists(dest):
 # Make EC numbers to class labels
 uniprot_and_EC_data = pd.read_csv(uniprot_and_EC_path)
 EC_numbers = uniprot_and_EC_data['EC'].to_list()
-EC_numbers = [EC.split('.') for EC in EC_numbers]
-for i, ECs in enumerate(EC_numbers):
-    ECs = ECs[0:3]
-    EC_numbers[i] = '.'.join(str(EC) for EC in ECs)
-
-uniprot_and_EC_data['EC'] = EC_numbers
 
 # example pdb file
 pdb_files = [f for f in os.listdir(pdb_files_path) if f.endswith('pdb.gz')]
