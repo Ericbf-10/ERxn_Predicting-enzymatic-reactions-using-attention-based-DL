@@ -138,3 +138,5 @@ dmypy.json
 *.txt
 
 10_voxel_perceiver
+/results/10_enzyme_perceiver
+*.pt
