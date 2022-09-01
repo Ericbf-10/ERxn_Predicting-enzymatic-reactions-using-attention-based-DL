@@ -13,6 +13,7 @@ from sklearn.metrics import matthews_corrcoef, roc_curve, auc
 import time
 
 VOXEL_DATA = False # true for voxels, false for point clouds
+RESUME_TRAINING = True
 
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
@@ -47,7 +48,7 @@ validation_data = dataset.drop(training_data.index).drop(test_data.index)
 LEARNING_RATE = 0.001
 WEIGHT_DECAY = 1e-4
 NUM_EPOCHS = 1000
-PATIENCE = 20
+PATIENCE = 50
 BATCH_SIZE = 10
 PIN_MEMORY = False
 
@@ -86,9 +87,9 @@ valid_loader = torch.utils.data.DataLoader(
 
 
 model = Perceiver(
-    input_channels = INPUT_CHANNELS,          # number of channels for each token of the input - in my case 4 atom chanels
-    input_axis = INPUT_AXIS,              # number of axis for input data (2 for images, 3 for video) - in my case 3 dimensional box
-    num_freq_bands = 6,          # number of freq bands, with original value (2 * K + 1)
+    input_channels = INPUT_CHANNELS,            # number of channels for each token of the input - in my case 4 atom chanels
+    input_axis = INPUT_AXIS,                    # number of axis for input data (2 for images, 3 for video) - in my case 3 dimensional box
+    num_freq_bands = 6,                         # number of freq bands, with original value (2 * K + 1)
     max_freq = 10.,              # maximum frequency, hyperparameter depending on how fine the data is
     depth = 6,                   # depth of net. The shape of the final attention mechanism will be:
                                  #   depth * (cross attention -> self_per_cross_attn * self attention)
@@ -114,8 +115,17 @@ train_loss, test_loss = [], []
 early_stopping = EarlyStopping(patience=PATIENCE)
 
 summary = []
+if RESUME_TRAINING:
+    # load model state
+    model.load_state_dict(torch.load(os.path.join(results_dir, f'10_enzyme_perceiver')))
+
+    # continiue summary
+    with open(os.path.join(results_dir, '10_summary.txt'), 'r') as f:
+        summary = f.readlines()
+        EPOCH = int(summary[-1].split('\t')[0].split(':')[1]) + 1
+
 start = time.time()
-for epoch in range(NUM_EPOCHS):
+for epoch in range(EPOCH, NUM_EPOCHS):
     batch_loss = 0
     model.train()
     for i, (x_train, y_train, _, _) in enumerate(train_loader):
