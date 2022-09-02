@@ -54,7 +54,6 @@ WEIGHT_DECAY = 1e-4
 NUM_EPOCHS = 1000
 PATIENCE = 10
 BATCH_SIZE = 10
-MOMENTUM = 0.9
 PIN_MEMORY = False
 
 # dataset and data loader
@@ -116,8 +115,7 @@ model = Perceiver(
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(),
                             lr=LEARNING_RATE,
-                            weight_decay=WEIGHT_DECAY,
-                            momentum=MOMENTUM)
+                            weight_decay=WEIGHT_DECAY)
 train_loss, test_loss = [], []
 
 early_stopping = EarlyStopping(patience=PATIENCE)
