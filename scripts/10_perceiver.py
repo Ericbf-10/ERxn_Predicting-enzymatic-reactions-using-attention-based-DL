@@ -130,6 +130,8 @@ if RESUME_TRAINING:
         summary = f.readlines()
         summary = [s.replace('\n') for s in summary]
         EPOCH = int(summary[-1].split('\t')[0].split(':')[1]) + 1
+else:
+    EPOCH = 0
 
 start = time.time()
 for epoch in range(EPOCH, NUM_EPOCHS):
