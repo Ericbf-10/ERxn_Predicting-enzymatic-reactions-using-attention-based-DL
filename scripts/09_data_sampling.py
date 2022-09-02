@@ -20,6 +20,13 @@ ec_data_path = os.path.join(data_dir, 'processed/02_uniprotID_and_EC_reduced.csv
 pc_data = pd.read_csv(pc_data_path)
 ec_data = pd.read_csv(ec_data_path)
 
+# remove rows when no point cloud available
+point_clouds = pc_data['point_cloud'].to_list()
+for i, row in ec_data.iterrows():
+    protein = row[0] + '.txt'
+    if protein not in point_clouds:
+        ec_data = ec_data.drop(i)
+
 # find number of enzymes per EC number
 ec_nums = ec_data['EC'].to_list()
 
@@ -58,7 +65,7 @@ print(reduced_data['EC'].value_counts())
 reduced_data.to_csv(os.path.join(datasets_dir, '09_balanced_data_set.csv'), index=False)
 
 # split data to train, test, validate
-data = pd.read_csv(os.path.join(datasets_dir, '09_balanced_data_set.csv'))
+data = reduced_data
 
 # find number of enzymes per EC number
 labels = data['EC'].unique()
