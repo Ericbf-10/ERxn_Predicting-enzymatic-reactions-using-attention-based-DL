@@ -64,7 +64,7 @@ class EarlyStopping:
         self.val_loss_min = val_loss
 
 
-def one_hot_encoder(y_list):
+def one_hot_encoder(y_list, _encoder=None):
     '''
     takes a list of objects and returns a list of one-hot-encoded vectors
     '''
@@ -83,6 +83,8 @@ def one_hot_encoder(y_list):
         else:
             encoder[y] = i
 
+    if encoder is not None:
+        encoder = _encoder
 
     encoded_ys = []
     for y in y_list:
@@ -91,7 +93,7 @@ def one_hot_encoder(y_list):
         encoded_y = zero_vector
         encoded_ys.append(encoded_y)
 
-    return encoded_ys
+    return encoded_ys, encoder
 
 def collate_point_cloud(batch):
     # batch contains a list of tuples of structure (sequence, target)

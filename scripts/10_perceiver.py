@@ -34,6 +34,8 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # load dataset
 dataset = pd.read_csv(dataset_path)
+_, encoder = one_hot_encoder(dataset['EC'].to_list())
+
 
 # 80 - 15 - 5 split - with random seed
 training_data = pd.read_csv(os.path.join(data_dir, 'datasets/09_train.csv'))
@@ -41,9 +43,9 @@ test_data = pd.read_csv(os.path.join(data_dir, 'datasets/09_test.csv'))
 validation_data = pd.read_csv(os.path.join(data_dir, 'datasets/09_valid.csv'))
 
 # one hot encoding of y-values
-training_data['y'] = one_hot_encoder(training_data['EC'].to_list())
-test_data['y'] = one_hot_encoder(test_data['EC'].to_list())
-validation_data['y'] = one_hot_encoder(validation_data['EC'].to_list())
+training_data['y'] = one_hot_encoder(training_data['EC'].to_list(), _encoder=encoder)
+test_data['y'] = one_hot_encoder(test_data['EC'].to_list(), _encoder=encoder)
+validation_data['y'] = one_hot_encoder(validation_data['EC'].to_list(), _encoder=encoder)
 N_CLASSES = len(training_data['y'].to_list()[0])
 
 # Hyper parameters
