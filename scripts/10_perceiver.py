@@ -43,9 +43,9 @@ test_data = pd.read_csv(os.path.join(data_dir, 'datasets/09_test.csv'))
 validation_data = pd.read_csv(os.path.join(data_dir, 'datasets/09_valid.csv'))
 
 # one hot encoding of y-values
-training_data['y'] = one_hot_encoder(training_data['EC'].to_list(), _encoder=encoder)
-test_data['y'] = one_hot_encoder(test_data['EC'].to_list(), _encoder=encoder)
-validation_data['y'] = one_hot_encoder(validation_data['EC'].to_list(), _encoder=encoder)
+training_data['y'], _ = one_hot_encoder(training_data['EC'].to_list(), _encoder=encoder)
+test_data['y'], _ = one_hot_encoder(test_data['EC'].to_list(), _encoder=encoder)
+validation_data['y'], _ = one_hot_encoder(validation_data['EC'].to_list(), _encoder=encoder)
 N_CLASSES = len(training_data['y'].to_list()[0])
 
 # Hyper parameters
