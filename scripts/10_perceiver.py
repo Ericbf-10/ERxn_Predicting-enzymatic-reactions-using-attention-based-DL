@@ -13,7 +13,7 @@ from sklearn.metrics import matthews_corrcoef, roc_curve, auc
 import time
 
 VOXEL_DATA = False # true for voxels, false for point clouds
-RESUME_TRAINING = True
+RESUME_TRAINING = False
 
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
@@ -35,21 +35,24 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # load dataset
 dataset = pd.read_csv(dataset_path)
 
-# one hot encoding of y-values
-dataset['y'] = one_hot_encoder(dataset['EC'].to_list())
-N_CLASSES = len(dataset['y'].to_list()[0])
-
 # 80 - 15 - 5 split - with random seed
-training_data = dataset.sample(frac=0.8, random_state=1)
-test_data = dataset.drop(training_data.index).sample(frac=0.15, random_state=1)
-validation_data = dataset.drop(training_data.index).drop(test_data.index)
+training_data = pd.read_csv(os.path.join(data_dir, 'datasets/09_train.csv'))
+test_data = pd.read_csv(os.path.join(data_dir, 'datasets/09_test.csv'))
+validation_data = pd.read_csv(os.path.join(data_dir, 'datasets/09_valid.csv'))
+
+# one hot encoding of y-values
+training_data['y'] = one_hot_encoder(training_data['EC'].to_list())
+test_data['y'] = one_hot_encoder(test_data['EC'].to_list())
+validation_data['y'] = one_hot_encoder(validation_data['EC'].to_list())
+N_CLASSES = len(training_data['y'].to_list()[0])
 
 # Hyper parameters
 LEARNING_RATE = 0.001
 WEIGHT_DECAY = 1e-4
 NUM_EPOCHS = 1000
-PATIENCE = 50
+PATIENCE = 10
 BATCH_SIZE = 10
+MOMENTUM = 0.9
 PIN_MEMORY = False
 
 # dataset and data loader
@@ -109,7 +112,10 @@ model = Perceiver(
 
 # training loop
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
+optimizer = torch.optim.SGD(model.parameters(),
+                            lr=LEARNING_RATE,
+                            weight_decay=WEIGHT_DECAY,
+                            momentum=MOMENTUM)
 train_loss, test_loss = [], []
 
 early_stopping = EarlyStopping(patience=PATIENCE)
@@ -122,6 +128,7 @@ if RESUME_TRAINING:
     # continiue summary
     with open(os.path.join(results_dir, '10_summary.txt'), 'r') as f:
         summary = f.readlines()
+        summary = [s.replace('\n') for s in summary]
         EPOCH = int(summary[-1].split('\t')[0].split(':')[1]) + 1
 
 start = time.time()
@@ -146,6 +153,8 @@ for epoch in range(EPOCH, NUM_EPOCHS):
 
     batch_loss = 0
     model.eval()
+    correct = 0
+    total = 0
     for i, (x_test, y_test, _, _) in enumerate(test_loader):
         # attach to device
         x_test = x_test.to(device)
@@ -155,12 +164,17 @@ for epoch in range(EPOCH, NUM_EPOCHS):
         loss = criterion(pred, y_test)
         batch_loss += loss.data
 
-    test_loss.append(batch_loss / len(test_loader))
+        _, predicted = torch.max(pred.data, 1)
+        total += y_test.size(0)
+        correct += (pred == y_test).sum().item()
 
+
+    test_loss.append(batch_loss / len(test_loader))
+    acc = 100 * correct // total
     # turn if condition on for real run
     if epoch % (1) == 0:
-        summary.append('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
-        print('Train Epoch: {}\tLoss: {:.6f}\tVal Loss: {:.6f}'.format(epoch, train_loss[-1], test_loss[-1]))
+        summary.append('Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f}\tTest Acc: {:.6f} %'.format(epoch, train_loss[-1], test_loss[-1], acc))
+        print('Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f}\tTest Acc: {:.6f} %'.format(epoch, train_loss[-1], test_loss[-1], acc))
 
     if invoke(early_stopping, test_loss[-1], model, implement=True):
         model.load_state_dict(torch.load('checkpoint.pt'))
@@ -201,6 +215,8 @@ with torch.no_grad():
     y_valid_class = np.zeros(n_points)
 
     model.eval()
+    correct = 0
+    total = 0
     for i, (x_valid, y_valid, _, _) in enumerate(valid_loader):
         # attach to device
         x_valid = x_valid.to(device)
@@ -210,7 +226,13 @@ with torch.no_grad():
         y_class_pred[i] = pred.detach().cpu().numpy().argmax()
         y_valid_class[i] = y_valid.detach().cpu().numpy().argmax()
 
+        _, predicted = torch.max(pred.data, 1)
+        total += y_valid.size(0)
+        correct += (pred == y_valid).sum().item()
+
+acc = 100 * correct // total
 mcc = matthews_corrcoef(y_valid_class, y_class_pred)
+summary.append('\nValidation Acc: ' + str(acc) + ' %')
 summary.append('\nmathews correlation coefficient: ' + str(mcc))
 print(mcc)
 
