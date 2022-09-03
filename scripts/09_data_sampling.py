@@ -34,7 +34,7 @@ for i, row in ec_data.iterrows():
 ec_nums = ec_data['EC'].to_list()
 
 ec_data['EC'] = ec_nums
-ec_data['point_cloud'] = pcs
+ec_data['protein'] = pcs
 
 # filter low_counts
 ec_data = ec_data[ec_data.groupby('EC')['EC'].transform('count')>=MIN_SAMPLES].copy()
