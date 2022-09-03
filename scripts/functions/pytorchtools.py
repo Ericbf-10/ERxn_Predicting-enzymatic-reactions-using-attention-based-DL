@@ -139,3 +139,16 @@ def collate_voxels(batch, add_noise=False, VOXEL_DATA=False):
     xx_pad = torch.stack(xx_pad).type(torch.float).to(device)
 
     return xx_pad, yy_pad, x_lens, y_lens
+
+def get_acc(y_pred, y_target):
+    pred_class = [pred.argmax() for pred in y_pred]
+    target_class = [t.argmax() for t in y_target]
+    correct = 0
+    false = 0
+    for i in range(len(pred_class)):
+        if pred_class[i] == target_class[i]:
+            correct += 1
+        else:
+            false += 1
+    acc = 100 * correct / (correct + false)
+    return acc

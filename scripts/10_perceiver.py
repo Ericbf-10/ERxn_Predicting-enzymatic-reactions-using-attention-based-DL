@@ -7,7 +7,7 @@ import torch.nn as nn
 from perceiver_pytorch import Perceiver
 import sys
 sys.path.append('functions/')
-from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, collate_voxels
+from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, collate_voxels, get_acc
 from functions.customDataset import point_cloud_dataset, voxel_dataset
 from sklearn.metrics import matthews_corrcoef, roc_curve, auc
 import time
@@ -159,8 +159,7 @@ for epoch in range(EPOCH, NUM_EPOCHS):
 
     batch_loss = 0
     model.eval()
-    correct = 0
-    total = 0
+    acc = 0
     for i, (x_test, y_test, _, _) in enumerate(test_loader):
         # attach to device
         x_test = x_test.to(device)
@@ -170,13 +169,11 @@ for epoch in range(EPOCH, NUM_EPOCHS):
         loss = criterion(pred, y_test)
         batch_loss += loss.data
 
-        _, predicted = torch.max(pred.data, 1)
-        total += y_test.size(0)
-        correct += (pred == y_test).sum().item()
+        acc += get_acc(pred, y_test)
 
 
     test_loss.append(batch_loss / len(test_loader))
-    acc = 100 * correct // total
+    acc = 100 * acc / len(test_loader)
     # turn if condition on for real run
     if epoch % (1) == 0:
         summary.append('Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f}\tTest Acc: {:.6f} %'.format(epoch, train_loss[-1], test_loss[-1], acc))
@@ -221,8 +218,7 @@ with torch.no_grad():
     y_valid_class = np.zeros(n_points)
 
     model.eval()
-    correct = 0
-    total = 0
+    acc = 0
     for i, (x_valid, y_valid, _, _) in enumerate(valid_loader):
         # attach to device
         x_valid = x_valid.to(device)
@@ -232,11 +228,9 @@ with torch.no_grad():
         y_class_pred[i] = pred.detach().cpu().numpy().argmax()
         y_valid_class[i] = y_valid.detach().cpu().numpy().argmax()
 
-        _, predicted = torch.max(pred.data, 1)
-        total += y_valid.size(0)
-        correct += (pred == y_valid).sum().item()
+        acc += get_acc(pred, y_valid)
 
-acc = 100 * correct // total
+acc = 100 * acc / len(test_loader)
 mcc = matthews_corrcoef(y_valid_class, y_class_pred)
 summary.append('\nValidation Acc: ' + str(acc) + ' %')
 summary.append('\nmathews correlation coefficient: ' + str(mcc))
