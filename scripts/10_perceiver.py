@@ -76,7 +76,8 @@ train_loader = torch.utils.data.DataLoader(
     train,
     batch_size=BATCH_SIZE,
     collate_fn=collate_voxels,
-    pin_memory=PIN_MEMORY)
+    pin_memory=PIN_MEMORY,
+    shuffle=True)
 
 test_loader = torch.utils.data.DataLoader(
     test,
