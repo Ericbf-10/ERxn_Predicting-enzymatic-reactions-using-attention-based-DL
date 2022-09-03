@@ -35,22 +35,13 @@ ec_data['EC'] = ec_nums
 # filter low_counts
 ec_data = ec_data[ec_data.groupby('EC')['EC'].transform('count')>=MIN_SAMPLES].copy()
 
-point_clouds = []
-EC_numbers = []
-
-# try without down sampling
-reduced_data = pd.DataFrame({
-    'point_cloud':point_clouds,
-    'EC':EC_numbers
-})
-
-print(reduced_data['EC'].value_counts())
+print(ec_data['EC'].value_counts())
 
 
-reduced_data.to_csv(os.path.join(datasets_dir, '09_balanced_data_set.csv'), index=False)
+ec_data.to_csv(os.path.join(datasets_dir, '09_balanced_data_set.csv'), index=False)
 
 # split data to train, test, validate
-data = reduced_data
+data = ec_data
 
 # find number of enzymes per EC number
 labels = data['EC'].unique()
