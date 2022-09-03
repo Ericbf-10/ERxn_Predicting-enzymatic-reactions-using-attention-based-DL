@@ -22,15 +22,16 @@ ec_data = pd.read_csv(ec_data_path)
 
 # remove rows when no point cloud available
 point_clouds = pc_data['point_cloud'].to_list()
+point_clouds = [s + '.txt' for s in point_clouds]
 for i, row in ec_data.iterrows():
-    protein = row[0] + '.txt'
-    if protein not in point_clouds:
+    if row[0] not in point_clouds:
         ec_data = ec_data.drop(i)
 
 # find number of enzymes per EC number
 ec_nums = ec_data['EC'].to_list()
 
 ec_data['EC'] = ec_nums
+ec_data['point_cloud'] = point_clouds
 
 # filter low_counts
 ec_data = ec_data[ec_data.groupby('EC')['EC'].transform('count')>=MIN_SAMPLES].copy()
