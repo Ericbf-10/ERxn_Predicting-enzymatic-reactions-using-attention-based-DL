@@ -60,10 +60,10 @@ for label in labels:
     df = data[data['EC'] == label]
     num_data = len(df)
     if num_data >= 20:
-        valid = df.sample(frac=0.05, random_state=1)
-        test = df.sample(frac=0.15, random_state=1)
+        test = df.sample(frac=0.2, random_state=1)
+        valid = test.sample(frac=0.25, random_state=1)
         train = df.drop(test.index)
-        train = df.drop(valid.index)
+        test = test.drop(valid.index)
         for i, row in train.iterrows():
             train_x.append(row[0])
             train_y.append(row[1])
@@ -74,10 +74,10 @@ for label in labels:
             val_x.append(row[0])
             val_y.append(row[1])
     else:
-        valid = df.sample(frac=0.1, random_state=1)
         test = df.sample(frac=0.2, random_state=1)
+        valid = test.sample(frac=0.5, random_state=1)
         train = df.drop(test.index)
-        train = df.drop(valid.index)
+        test = test.drop(valid.index)
         for i, row in train.iterrows():
             train_x.append(row[0])
             train_y.append(row[1])
