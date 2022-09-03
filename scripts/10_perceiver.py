@@ -43,9 +43,12 @@ test_data = pd.read_csv(os.path.join(data_dir, 'datasets/09_test.csv'))
 validation_data = pd.read_csv(os.path.join(data_dir, 'datasets/09_valid.csv'))
 
 # one hot encoding of y-values
-training_data['y'], _ = one_hot_encoder(training_data['EC'].to_list(), _encoder=encoder)
-test_data['y'], _ = one_hot_encoder(test_data['EC'].to_list(), _encoder=encoder)
-validation_data['y'], _ = one_hot_encoder(validation_data['EC'].to_list(), _encoder=encoder)
+#training_data['y'], _ = one_hot_encoder(training_data['EC'].to_list(), _encoder=encoder)
+#test_data['y'], _ = one_hot_encoder(test_data['EC'].to_list(), _encoder=encoder)
+#validation_data['y'], _ = one_hot_encoder(validation_data['EC'].to_list(), _encoder=encoder)
+training_data = dataset.sample(frac=0.8, random_state=1)
+test_data = dataset.drop(training_data.index).sample(frac=0.15, random_state=1)
+validation_data = dataset.drop(training_data.index).drop(test_data.index)
 N_CLASSES = len(training_data['y'].to_list()[0])
 
 # Hyper parameters
@@ -54,6 +57,7 @@ WEIGHT_DECAY = 1e-4
 NUM_EPOCHS = 1000
 PATIENCE = 10
 BATCH_SIZE = 10
+MOMENTUM = 0.9
 PIN_MEMORY = False
 
 # dataset and data loader
@@ -115,7 +119,9 @@ model = Perceiver(
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(),
                             lr=LEARNING_RATE,
-                            weight_decay=WEIGHT_DECAY)
+                            weight_decay=WEIGHT_DECAY,
+                            momentum=MOMENTUM)
+
 train_loss, test_loss = [], []
 
 early_stopping = EarlyStopping(patience=PATIENCE)
