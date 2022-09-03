@@ -37,28 +37,13 @@ ec_data = ec_data[ec_data.groupby('EC')['EC'].transform('count')>=MIN_SAMPLES].c
 
 point_clouds = []
 EC_numbers = []
-ECs = {}
-i = 0
-for index, row in ec_data.iterrows():
-    if row[1] in ECs.keys():
-        # if over 99 been sampled pass
-        if ECs[row[1]] > 98:
-            pass
-        else:
-            point_clouds.append(row[0]+'.txt')
-            EC_numbers.append(row[1])
-        ECs[row[1]] += 1
 
-    # new EC number
-    else:
-        ECs[row[1]] = 0
-        point_clouds.append(row[0] + '.txt')
-        EC_numbers.append(row[1])
-
+# try without down sampling
 reduced_data = pd.DataFrame({
     'point_cloud':point_clouds,
     'EC':EC_numbers
 })
+
 print(reduced_data['EC'].value_counts())
 
 

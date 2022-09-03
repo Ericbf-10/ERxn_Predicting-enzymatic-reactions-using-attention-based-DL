@@ -68,25 +68,26 @@ def one_hot_encoder(y_list, _encoder=None):
     '''
     takes a list of objects and returns a list of one-hot-encoded vectors
     '''
-    unique_labels = []
-    for y in y_list:
-        if y in unique_labels:
-            pass
-        else:
-            unique_labels.append(y)
-    unique_labels = sorted(unique_labels)
 
-    encoder = {}
-    for i, y in enumerate(unique_labels):
-        if y in encoder.keys():
-            pass
-        else:
-            encoder[y] = i
 
     if _encoder is not None:
         encoder = _encoder
+        unique_labels = _encoder.keys()
+    else:
+        unique_labels = []
+        for y in y_list:
+            if y in unique_labels:
+                pass
+            else:
+                unique_labels.append(y)
+        unique_labels = sorted(unique_labels)
+        encoder = {}
+        for i, y in enumerate(unique_labels):
+            if y in encoder.keys():
+                pass
+            else:
+                encoder[y] = i
 
-    print(encoder)
     encoded_ys = []
     for y in y_list:
         zero_vector = [0 for i in range(len(unique_labels))]
