@@ -140,15 +140,24 @@ def collate_voxels(batch, add_noise=False, VOXEL_DATA=False):
 
     return xx_pad, yy_pad, x_lens, y_lens
 
-def get_acc(y_pred, y_target):
+
+def get_acc(y_pred, y_target, return_classes=False):
     pred_class = [pred.argmax() for pred in y_pred]
     target_class = [t.argmax() for t in y_target]
     correct = 0
     false = 0
+    y_hat = np.zeros(y_pred.shape[0])
+    y_true = np.zeros(y_pred.shape[0])
     for i in range(len(pred_class)):
+        y_hat[i] = pred_class[i]
+        y_true[i] = target_class[i]
         if pred_class[i] == target_class[i]:
             correct += 1
         else:
             false += 1
     acc = 100 * correct / (correct + false)
-    return acc
+
+    if return_classes:
+        return acc, y_hat, y_true
+    else:
+        return acc
