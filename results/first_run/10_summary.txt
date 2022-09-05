@@ -1,0 +1,55 @@
+Train Epoch: 0	Loss: 6.297969	Test Loss: 6.933559	Test Acc: 0.894833 %
+Train Epoch: 1	Loss: 6.012658	Test Loss: 6.622149	Test Acc: 1.660516 %
+Train Epoch: 2	Loss: 5.578043	Test Loss: 5.467599	Test Acc: 4.557195 %
+Train Epoch: 3	Loss: 5.208292	Test Loss: 5.272577	Test Acc: 5.000000 %
+Train Epoch: 4	Loss: 4.988819	Test Loss: 5.184523	Test Acc: 5.645756 %
+Train Epoch: 5	Loss: 4.756246	Test Loss: 4.888072	Test Acc: 8.357933 %
+Train Epoch: 6	Loss: 4.491607	Test Loss: 4.430000	Test Acc: 14.086715 %
+Train Epoch: 7	Loss: 4.115337	Test Loss: 4.077980	Test Acc: 19.547970 %
+Train Epoch: 8	Loss: 3.668008	Test Loss: 3.941056	Test Acc: 22.241697 %
+Train Epoch: 9	Loss: 3.277741	Test Loss: 3.453043	Test Acc: 27.453874 %
+Train Epoch: 10	Loss: 2.886917	Test Loss: 3.157686	Test Acc: 33.846863 %
+Train Epoch: 11	Loss: 2.540914	Test Loss: 2.851695	Test Acc: 39.963099 %
+Train Epoch: 12	Loss: 2.229537	Test Loss: 2.694254	Test Acc: 41.577490 %
+Train Epoch: 13	Loss: 1.969607	Test Loss: 2.323180	Test Acc: 48.828413 %
+Train Epoch: 14	Loss: 1.743506	Test Loss: 2.196242	Test Acc: 51.983394 %
+Train Epoch: 15	Loss: 1.560237	Test Loss: 1.979608	Test Acc: 55.553505 %
+Train Epoch: 16	Loss: 1.393217	Test Loss: 1.802482	Test Acc: 58.219557 %
+Train Epoch: 17	Loss: 1.258105	Test Loss: 1.609662	Test Acc: 63.348708 %
+Train Epoch: 18	Loss: 1.132275	Test Loss: 1.684120	Test Acc: 61.208487 %
+Train Epoch: 19	Loss: 1.019722	Test Loss: 1.403771	Test Acc: 67.629151 %
+Train Epoch: 20	Loss: 0.924446	Test Loss: 1.418537	Test Acc: 67.287822 %
+Train Epoch: 21	Loss: 0.847498	Test Loss: 1.268340	Test Acc: 70.092250 %
+Train Epoch: 22	Loss: 0.761478	Test Loss: 1.410506	Test Acc: 67.241697 %
+Train Epoch: 23	Loss: 0.696923	Test Loss: 1.233722	Test Acc: 71.023985 %
+Train Epoch: 24	Loss: 0.633780	Test Loss: 1.297014	Test Acc: 69.658671 %
+Train Epoch: 25	Loss: 0.575082	Test Loss: 1.173032	Test Acc: 72.398523 %
+Train Epoch: 26	Loss: 0.520138	Test Loss: 1.184038	Test Acc: 72.813653 %
+Train Epoch: 27	Loss: 0.481811	Test Loss: 1.222231	Test Acc: 71.522140 %
+Train Epoch: 28	Loss: 0.433399	Test Loss: 1.165813	Test Acc: 73.173431 %
+Train Epoch: 29	Loss: 0.401257	Test Loss: 1.035931	Test Acc: 76.125461 %
+Train Epoch: 30	Loss: 0.364985	Test Loss: 1.122474	Test Acc: 74.566420 %
+Train Epoch: 31	Loss: 0.332368	Test Loss: 1.071972	Test Acc: 75.756457 %
+Train Epoch: 32	Loss: 0.302907	Test Loss: 1.070804	Test Acc: 75.664206 %
+Train Epoch: 33	Loss: 0.276355	Test Loss: 1.020724	Test Acc: 77.020295 %
+Train Epoch: 34	Loss: 0.257542	Test Loss: 1.075643	Test Acc: 76.291512 %
+Train Epoch: 35	Loss: 0.240738	Test Loss: 1.080804	Test Acc: 76.845018 %
+Train Epoch: 36	Loss: 0.222150	Test Loss: 1.014250	Test Acc: 77.712177 %
+Train Epoch: 37	Loss: 0.205675	Test Loss: 1.105801	Test Acc: 75.774907 %
+Train Epoch: 38	Loss: 0.194724	Test Loss: 1.061090	Test Acc: 76.780442 %
+Train Epoch: 39	Loss: 0.191044	Test Loss: 0.967780	Test Acc: 79.271217 %
+Train Epoch: 40	Loss: 0.180281	Test Loss: 1.134228	Test Acc: 75.258302 %
+Train Epoch: 41	Loss: 0.174887	Test Loss: 1.043659	Test Acc: 77.721402 %
+Train Epoch: 42	Loss: 0.166178	Test Loss: 1.101633	Test Acc: 76.309963 %
+Train Epoch: 43	Loss: 0.158964	Test Loss: 1.003882	Test Acc: 78.579335 %
+Train Epoch: 44	Loss: 0.160088	Test Loss: 0.984713	Test Acc: 79.501845 %
+Train Epoch: 45	Loss: 0.150600	Test Loss: 1.038961	Test Acc: 77.832103 %
+Train Epoch: 46	Loss: 0.149222	Test Loss: 0.991236	Test Acc: 79.243542 %
+Train Epoch: 47	Loss: 0.143814	Test Loss: 1.010117	Test Acc: 78.422509 %
+Train Epoch: 48	Loss: 0.142356	Test Loss: 0.987386	Test Acc: 79.511070 %
+Train Epoch: 49	Loss: 0.145030	Test Loss: 0.982074	Test Acc: 79.086715 %
+Early stopping after 49 epochs
+
+Validation Acc: 28.7084870848 %
+
+mathews correlation coefficient: 0.5368536490672516
