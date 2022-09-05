@@ -1,0 +1,350 @@
+Train Epoch: 0	Loss: 6.455708	Val Loss: 6.434037
+
+Train Epoch: 1	Loss: 6.358921	Val Loss: 6.402937
+
+Train Epoch: 2	Loss: 6.256062	Val Loss: 6.263526
+
+Train Epoch: 3	Loss: 6.117912	Val Loss: 6.195406
+
+Train Epoch: 4	Loss: 6.050165	Val Loss: 6.163037
+
+Train Epoch: 5	Loss: 6.008806	Val Loss: 6.144506
+
+Train Epoch: 6	Loss: 5.975257	Val Loss: 6.134446
+
+Train Epoch: 7	Loss: 5.943168	Val Loss: 6.126973
+
+Train Epoch: 8	Loss: 5.912030	Val Loss: 6.116959
+
+Train Epoch: 9	Loss: 5.884109	Val Loss: 6.107048
+
+Train Epoch: 10	Loss: 5.860035	Val Loss: 6.099484
+
+Train Epoch: 11	Loss: 5.838828	Val Loss: 6.094564
+
+Train Epoch: 12	Loss: 5.819216	Val Loss: 6.092000
+
+Train Epoch: 13	Loss: 5.799974	Val Loss: 6.091362
+
+Train Epoch: 14	Loss: 5.779795	Val Loss: 6.091312
+
+Train Epoch: 15	Loss: 5.757588	Val Loss: 6.089417
+
+Train Epoch: 16	Loss: 5.732926	Val Loss: 6.082535
+
+Train Epoch: 17	Loss: 5.705946	Val Loss: 6.068888
+
+Train Epoch: 18	Loss: 5.677119	Val Loss: 6.050578
+
+Train Epoch: 19	Loss: 5.647119	Val Loss: 6.032774
+
+Train Epoch: 20	Loss: 5.616677	Val Loss: 6.012020
+
+Train Epoch: 21	Loss: 5.586251	Val Loss: 5.966564
+
+Train Epoch: 22	Loss: 5.555883	Val Loss: 5.892263
+
+Train Epoch: 23	Loss: 5.525322	Val Loss: 5.817701
+
+Train Epoch: 24	Loss: 5.494096	Val Loss: 5.762992
+
+Train Epoch: 25	Loss: 5.461535	Val Loss: 5.729815
+
+Train Epoch: 26	Loss: 5.426351	Val Loss: 5.714615
+
+Train Epoch: 27	Loss: 5.386393	Val Loss: 5.713290
+
+Train Epoch: 28	Loss: 5.338714	Val Loss: 5.722792
+
+Train Epoch: 29	Loss: 5.282564	Val Loss: 5.744284
+
+Train Epoch: 30	Loss: 5.223608	Val Loss: 5.732992
+
+Train Epoch: 31	Loss: 5.168425	Val Loss: 5.685193
+
+Train Epoch: 32	Loss: 5.116777	Val Loss: 5.640153
+
+Train Epoch: 33	Loss: 5.066453	Val Loss: 5.601773
+
+Train Epoch: 34	Loss: 5.016237	Val Loss: 5.564279
+
+Train Epoch: 35	Loss: 4.965703	Val Loss: 5.524237
+
+Train Epoch: 36	Loss: 4.915060	Val Loss: 5.479457
+
+Train Epoch: 37	Loss: 4.864879	Val Loss: 5.426932
+
+Train Epoch: 38	Loss: 4.815705	Val Loss: 5.368025
+
+Train Epoch: 39	Loss: 4.767736	Val Loss: 5.307390
+
+Train Epoch: 40	Loss: 4.720936	Val Loss: 5.248923
+
+Train Epoch: 41	Loss: 4.675293	Val Loss: 5.194074
+
+Train Epoch: 42	Loss: 4.630764	Val Loss: 5.143441
+
+Train Epoch: 43	Loss: 4.587310	Val Loss: 5.097165
+
+Train Epoch: 44	Loss: 4.544878	Val Loss: 5.056582
+
+Train Epoch: 45	Loss: 4.503198	Val Loss: 5.022089
+
+Train Epoch: 46	Loss: 4.461997	Val Loss: 4.993078
+
+Train Epoch: 47	Loss: 4.421171	Val Loss: 4.967674
+
+Train Epoch: 48	Loss: 4.380637	Val Loss: 4.944579
+
+Train Epoch: 49	Loss: 4.340465	Val Loss: 4.921559
+
+Train Epoch: 50	Loss: 4.300673	Val Loss: 4.898093
+
+Train Epoch: 51	Loss: 4.261352	Val Loss: 4.873851
+
+Train Epoch: 52	Loss: 4.222616	Val Loss: 4.848889
+
+Train Epoch: 53	Loss: 4.184525	Val Loss: 4.824459
+
+Train Epoch: 54	Loss: 4.147035	Val Loss: 4.800052
+
+Train Epoch: 55	Loss: 4.110032	Val Loss: 4.776215
+
+Train Epoch: 56	Loss: 4.073329	Val Loss: 4.752656
+
+Train Epoch: 57	Loss: 4.036826	Val Loss: 4.728210
+
+Train Epoch: 58	Loss: 4.000342	Val Loss: 4.702451
+
+Train Epoch: 59	Loss: 3.963733	Val Loss: 4.674167
+
+Train Epoch: 60	Loss: 3.926848	Val Loss: 4.642242
+
+Train Epoch: 61	Loss: 3.889550	Val Loss: 4.605948
+
+Train Epoch: 62	Loss: 3.851747	Val Loss: 4.565032
+
+Train Epoch: 63	Loss: 3.813368	Val Loss: 4.520261
+
+Train Epoch: 64	Loss: 3.774457	Val Loss: 4.472316
+
+Train Epoch: 65	Loss: 3.735033	Val Loss: 4.423964
+
+Train Epoch: 66	Loss: 3.695242	Val Loss: 4.376551
+
+Train Epoch: 67	Loss: 3.655149	Val Loss: 4.330849
+
+Train Epoch: 68	Loss: 3.614926	Val Loss: 4.287616
+
+Train Epoch: 69	Loss: 3.574593	Val Loss: 4.245972
+
+Train Epoch: 70	Loss: 3.534240	Val Loss: 4.206282
+
+Train Epoch: 71	Loss: 3.493828	Val Loss: 4.168122
+
+Train Epoch: 72	Loss: 3.453361	Val Loss: 4.131660
+
+Train Epoch: 73	Loss: 3.412885	Val Loss: 4.096568
+
+Train Epoch: 74	Loss: 3.372363	Val Loss: 4.062897
+
+Train Epoch: 75	Loss: 3.331850	Val Loss: 4.031167
+
+Train Epoch: 76	Loss: 3.291317	Val Loss: 4.000694
+
+Train Epoch: 77	Loss: 3.250820	Val Loss: 3.971307
+
+Train Epoch: 78	Loss: 3.210371	Val Loss: 3.943179
+
+Train Epoch: 79	Loss: 3.170053	Val Loss: 3.916568
+
+Train Epoch: 80	Loss: 3.129921	Val Loss: 3.890945
+
+Train Epoch: 81	Loss: 3.090002	Val Loss: 3.866184
+
+Train Epoch: 82	Loss: 3.050264	Val Loss: 3.842891
+
+Train Epoch: 83	Loss: 3.010832	Val Loss: 3.820905
+
+Train Epoch: 84	Loss: 2.971581	Val Loss: 3.799354
+
+Train Epoch: 85	Loss: 2.932511	Val Loss: 3.778775
+
+Train Epoch: 86	Loss: 2.893677	Val Loss: 3.758430
+
+Train Epoch: 87	Loss: 2.855012	Val Loss: 3.738428
+
+Train Epoch: 88	Loss: 2.816501	Val Loss: 3.718491
+
+Train Epoch: 89	Loss: 2.778162	Val Loss: 3.697983
+
+Train Epoch: 90	Loss: 2.739977	Val Loss: 3.675496
+
+Train Epoch: 91	Loss: 2.701926	Val Loss: 3.651479
+
+Train Epoch: 92	Loss: 2.664002	Val Loss: 3.625242
+
+Train Epoch: 93	Loss: 2.626161	Val Loss: 3.595736
+
+Train Epoch: 94	Loss: 2.588406	Val Loss: 3.563813
+
+Train Epoch: 95	Loss: 2.550692	Val Loss: 3.528664
+
+Train Epoch: 96	Loss: 2.513002	Val Loss: 3.490885
+
+Train Epoch: 97	Loss: 2.475272	Val Loss: 3.451498
+
+Train Epoch: 98	Loss: 2.437510	Val Loss: 3.410661
+
+Train Epoch: 99	Loss: 2.399665	Val Loss: 3.369947
+
+Train Epoch: 100	Loss: 2.361702	Val Loss: 3.331678
+
+Train Epoch: 101	Loss: 2.323605	Val Loss: 3.294277
+
+Train Epoch: 102	Loss: 2.285336	Val Loss: 3.260023
+
+Train Epoch: 103	Loss: 2.246911	Val Loss: 3.229958
+
+Train Epoch: 104	Loss: 2.208302	Val Loss: 3.202347
+
+Train Epoch: 105	Loss: 2.169548	Val Loss: 3.178673
+
+Train Epoch: 106	Loss: 2.130628	Val Loss: 3.158291
+
+Train Epoch: 107	Loss: 2.091535	Val Loss: 3.139869
+
+Train Epoch: 108	Loss: 2.052382	Val Loss: 3.124346
+
+Train Epoch: 109	Loss: 2.013099	Val Loss: 3.110502
+
+Train Epoch: 110	Loss: 1.973751	Val Loss: 3.097522
+
+Train Epoch: 111	Loss: 1.934296	Val Loss: 3.086098
+
+Train Epoch: 112	Loss: 1.894748	Val Loss: 3.074783
+
+Train Epoch: 113	Loss: 1.855104	Val Loss: 3.063524
+
+Train Epoch: 114	Loss: 1.815337	Val Loss: 3.052784
+
+Train Epoch: 115	Loss: 1.775433	Val Loss: 3.041556
+
+Train Epoch: 116	Loss: 1.735393	Val Loss: 3.029872
+
+Train Epoch: 117	Loss: 1.695198	Val Loss: 3.017927
+
+Train Epoch: 118	Loss: 1.654801	Val Loss: 3.005388
+
+Train Epoch: 119	Loss: 1.614246	Val Loss: 2.992774
+
+Train Epoch: 120	Loss: 1.573524	Val Loss: 2.980073
+
+Train Epoch: 121	Loss: 1.532603	Val Loss: 2.967843
+
+Train Epoch: 122	Loss: 1.491564	Val Loss: 2.954962
+
+Train Epoch: 123	Loss: 1.450365	Val Loss: 2.942272
+
+Train Epoch: 124	Loss: 1.409039	Val Loss: 2.929768
+
+Train Epoch: 125	Loss: 1.367610	Val Loss: 2.917249
+
+Train Epoch: 126	Loss: 1.326111	Val Loss: 2.904011
+
+Train Epoch: 127	Loss: 1.284558	Val Loss: 2.890620
+
+Train Epoch: 128	Loss: 1.242946	Val Loss: 2.877104
+Train Epoch: 129	Loss: 1.201277	Val Loss: 2.862593
+Train Epoch: 130	Loss: 1.159606	Val Loss: 2.847171
+Train Epoch: 131	Loss: 1.117921	Val Loss: 2.831431
+Train Epoch: 132	Loss: 1.076237	Val Loss: 2.815016
+Train Epoch: 133	Loss: 1.034605	Val Loss: 2.798244
+Train Epoch: 134	Loss: 0.993049	Val Loss: 2.781819
+Train Epoch: 135	Loss: 0.951634	Val Loss: 2.765703
+Train Epoch: 136	Loss: 0.910406	Val Loss: 2.750005
+Train Epoch: 137	Loss: 0.869439	Val Loss: 2.734353
+Train Epoch: 138	Loss: 0.828782	Val Loss: 2.719229
+Train Epoch: 139	Loss: 0.788537	Val Loss: 2.704449
+Train Epoch: 140	Loss: 0.748762	Val Loss: 2.689360
+Train Epoch: 141	Loss: 0.709584	Val Loss: 2.673806
+Train Epoch: 142	Loss: 0.671093	Val Loss: 2.659548
+Train Epoch: 143	Loss: 0.633493	Val Loss: 2.645582
+Train Epoch: 144	Loss: 0.596840	Val Loss: 2.633482
+Train Epoch: 145	Loss: 0.560955	Val Loss: 2.622240
+Train Epoch: 146	Loss: 0.525964	Val Loss: 2.613129
+Train Epoch: 147	Loss: 0.492113	Val Loss: 2.605640
+Train Epoch: 148	Loss: 0.459597	Val Loss: 2.600837
+Train Epoch: 149	Loss: 0.428560	Val Loss: 2.598219
+Train Epoch: 150	Loss: 0.399213	Val Loss: 2.597694
+Train Epoch: 151	Loss: 0.371543	Val Loss: 2.597825
+Train Epoch: 152	Loss: 0.345551	Val Loss: 2.598297
+Train Epoch: 153	Loss: 0.321217	Val Loss: 2.599175
+Train Epoch: 154	Loss: 0.298501	Val Loss: 2.599733
+Train Epoch: 155	Loss: 0.277430	Val Loss: 2.600237
+Train Epoch: 156	Loss: 0.257951	Val Loss: 2.600257
+Train Epoch: 157	Loss: 0.239972	Val Loss: 2.599575
+Train Epoch: 158	Loss: 0.223432	Val Loss: 2.599058
+Train Epoch: 159	Loss: 0.208249	Val Loss: 2.598195
+Train Epoch: 160	Loss: 0.194327	Val Loss: 2.597673
+Train Epoch: 161	Loss: 0.181549	Val Loss: 2.597198
+Train Epoch: 162	Loss: 0.169823	Val Loss: 2.596692
+Train Epoch: 163	Loss: 0.159076	Val Loss: 2.596203
+Train Epoch: 164	Loss: 0.149240	Val Loss: 2.595906
+Train Epoch: 165	Loss: 0.140250	Val Loss: 2.595724
+Train Epoch: 166	Loss: 0.132040	Val Loss: 2.595678
+Train Epoch: 167	Loss: 0.124523	Val Loss: 2.595641
+Train Epoch: 168	Loss: 0.117656	Val Loss: 2.595464
+Train Epoch: 169	Loss: 0.111348	Val Loss: 2.595595
+Train Epoch: 170	Loss: 0.105546	Val Loss: 2.595634
+Train Epoch: 171	Loss: 0.100206	Val Loss: 2.595784
+Train Epoch: 172	Loss: 0.095269	Val Loss: 2.596300
+Train Epoch: 173	Loss: 0.090705	Val Loss: 2.596444
+Train Epoch: 174	Loss: 0.086478	Val Loss: 2.596888
+Train Epoch: 175	Loss: 0.082572	Val Loss: 2.597612
+Train Epoch: 176	Loss: 0.078946	Val Loss: 2.598369
+Train Epoch: 177	Loss: 0.075590	Val Loss: 2.599383
+Train Epoch: 178	Loss: 0.072489	Val Loss: 2.600356
+Train Epoch: 179	Loss: 0.069612	Val Loss: 2.601704
+Train Epoch: 180	Loss: 0.066916	Val Loss: 2.603177
+Train Epoch: 181	Loss: 0.064404	Val Loss: 2.604855
+Train Epoch: 182	Loss: 0.062050	Val Loss: 2.606168
+Train Epoch: 183	Loss: 0.059841	Val Loss: 2.607505
+Train Epoch: 184	Loss: 0.057754	Val Loss: 2.608638
+Train Epoch: 185	Loss: 0.055796	Val Loss: 2.609730
+Train Epoch: 186	Loss: 0.053943	Val Loss: 2.610878
+Train Epoch: 187	Loss: 0.052217	Val Loss: 2.611471
+Train Epoch: 188	Loss: 0.050592	Val Loss: 2.612600
+Train Epoch: 189	Loss: 0.049081	Val Loss: 2.613400
+Train Epoch: 190	Loss: 0.047624	Val Loss: 2.613976
+Train Epoch: 191	Loss: 0.046232	Val Loss: 2.614717
+Train Epoch: 192	Loss: 0.044927	Val Loss: 2.615423
+Train Epoch: 193	Loss: 0.043651	Val Loss: 2.616109
+Train Epoch: 194	Loss: 0.042563	Val Loss: 2.616686
+Train Epoch: 195	Loss: 0.041174	Val Loss: 2.617799
+Train Epoch: 196	Loss: 0.041057	Val Loss: 2.617165
+Train Epoch: 197	Loss: 0.038887	Val Loss: 2.619485
+Train Epoch: 198	Loss: 0.038772	Val Loss: 2.618848
+Train Epoch: 199	Loss: 0.036873	Val Loss: 2.621359
+Train Epoch: 200	Loss: 0.036523	Val Loss: 2.622239
+Train Epoch: 201	Loss: 0.035560	Val Loss: 2.624059
+Train Epoch: 202	Loss: 0.035580	Val Loss: 2.623894
+Train Epoch: 203	Loss: 0.033545	Val Loss: 2.626611
+Train Epoch: 204	Loss: 0.033838	Val Loss: 2.627206
+Train Epoch: 205	Loss: 0.032032	Val Loss: 2.629637
+Train Epoch: 206	Loss: 0.032409	Val Loss: 2.631768
+Train Epoch: 207	Loss: 0.030844	Val Loss: 2.634564
+Train Epoch: 208	Loss: 0.031251	Val Loss: 2.638312
+Train Epoch: 209	Loss: 0.029449	Val Loss: 2.641203
+Train Epoch: 210	Loss: 0.029911	Val Loss: 2.643676
+Train Epoch: 211	Loss: 0.028288	Val Loss: 2.640846
+Train Epoch: 212	Loss: 0.028781	Val Loss: 2.655956
+Train Epoch: 213	Loss: 0.027506	Val Loss: 2.641632
+Train Epoch: 214	Loss: 0.027905	Val Loss: 2.653088
+Train Epoch: 215	Loss: 0.026821	Val Loss: 2.650373
+Train Epoch: 216	Loss: 0.026605	Val Loss: 2.652466
+Train Epoch: 217	Loss: 0.026151	Val Loss: 2.648627
+Train Epoch: 218	Loss: 0.025438	Val Loss: 2.648874
+Early stopping after 218 epochs
+
+mathews correlation coefficient: 0.5147458517358764
