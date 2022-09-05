@@ -173,7 +173,7 @@ for epoch in range(EPOCH, NUM_EPOCHS):
 
 
     test_loss.append(batch_loss / len(test_loader))
-    acc = 100 * acc / len(test_loader)
+    acc = acc / len(test_loader)
     # turn if condition on for real run
     if epoch % (1) == 0:
         summary.append('Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f}\tTest Acc: {:.6f} %'.format(epoch, train_loss[-1], test_loss[-1], acc))
@@ -214,9 +214,6 @@ plot_losses(train_loss, test_loss)
 with torch.no_grad():
     n_points = len(validation_data)
 
-    y_class_pred = np.zeros(n_points)
-    y_valid_class = np.zeros(n_points)
-
     model.eval()
     acc = 0
     for i, (x_valid, y_valid, _, _) in enumerate(valid_loader):
@@ -225,12 +222,17 @@ with torch.no_grad():
         y_valid = y_valid.to(device).reshape([len(y_valid), -1])
 
         pred = model(x_valid)
-        y_class_pred[i] = pred.detach().cpu().numpy().argmax()
-        y_valid_class[i] = y_valid.detach().cpu().numpy().argmax()
 
-        acc += get_acc(pred, y_valid)
+        accuracy, y_hat, y_true = get_acc(pred, y_valid, return_classes=True)
+        if i == 0:
+            y_class_pred = y_hat
+            y_valid_class = y_true
+        else:
+            y_class_pred = np.concatenate((y_class_pred, y_hat))
+            y_valid_class = np.concatenate((y_valid_class, y_true))
+        acc += accuracy
 
-acc = 100 * acc / len(test_loader)
+acc = acc / len(test_loader)
 mcc = matthews_corrcoef(y_valid_class, y_class_pred)
 summary.append('\nValidation Acc: ' + str(acc) + ' %')
 summary.append('\nmathews correlation coefficient: ' + str(mcc))
@@ -239,16 +241,3 @@ print(mcc)
 with open(os.path.join(results_dir, '10_summary.txt'), 'w') as f:
     for line in summary:
         f.write(str(line) + '\n')
-
-# ROC and AUC (not available for multi class?)
-#fpr, tpr, threshold = roc_curve(y_valid_class, y_class_pred)
-#roc_auc = auc(fpr, tpr)
-
-#plt.title('Receiver Operating Characteristic')
-#plt.plot(fpr, tpr, label=f'AUC = {roc_auc}')
-#plt.legend(loc='best')
-#plt.plot(linestyle='--')
-#plt.ylabel('True Positive Rate')
-#plt.xlabel('False Positive Rate')
-#plt.savefig(os.path.join(results_dir, f'10_roc.png'))
-#plt.close()
