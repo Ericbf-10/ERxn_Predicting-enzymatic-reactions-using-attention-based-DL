@@ -50,6 +50,6 @@ Train Epoch: 48	Loss: 0.142356	Test Loss: 0.987386	Test Acc: 79.511070 %
 Train Epoch: 49	Loss: 0.145030	Test Loss: 0.982074	Test Acc: 79.086715 %
 Early stopping after 49 epochs
 
-Validation Acc: 28.7084870848 %
+Validation Acc: 76.415328 %
 
-mathews correlation coefficient: 0.5368536490672516
+mathews correlation coefficient: 0.7631828600478957

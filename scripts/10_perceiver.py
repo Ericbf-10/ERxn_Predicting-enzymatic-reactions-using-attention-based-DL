@@ -232,7 +232,7 @@ with torch.no_grad():
             y_valid_class = np.concatenate((y_valid_class, y_true))
         acc += accuracy
 
-acc = acc / len(test_loader)
+acc = acc / len(valid_loader)
 mcc = matthews_corrcoef(y_valid_class, y_class_pred)
 summary.append('\nValidation Acc: ' + str(acc) + ' %')
 summary.append('\nmathews correlation coefficient: ' + str(mcc))
