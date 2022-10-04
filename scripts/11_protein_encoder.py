@@ -33,7 +33,7 @@ dataset_path = os.path.join(data_dir, 'datasets/09_balanced_data_set.csv')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # load dataset
-dataset = pd.read_csv(dataset_path)
+dataset = pd.read_csv(dataset_path).sample(frac=0.1)
 _, encoder = one_hot_encoder(dataset['EC'].to_list())
 
 # get max length of sequence in dataset - for current data set 21166, set to 21200 in collate function
@@ -61,24 +61,15 @@ LEARNING_RATE = 0.001
 WEIGHT_DECAY = 1e-4
 NUM_EPOCHS = 1000
 PATIENCE = 10
-BATCH_SIZE = 100
+BATCH_SIZE = 1000
 MOMENTUM = 0.9
 PIN_MEMORY = False
 
 # dataset and data loader
-#train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
-if VOXEL_DATA:
-    train = voxel_dataset(df=training_data, point_cloud_path=point_cloud_path)
-    test = voxel_dataset(df=test_data, point_cloud_path=point_cloud_path)
-    valid = voxel_dataset(df=validation_data, point_cloud_path=point_cloud_path)
-    INPUT_CHANNELS = 4
-    INPUT_AXIS = 3
-else:
-    train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
-    test = point_cloud_dataset(df=test_data, point_cloud_path=point_cloud_path)
-    valid = point_cloud_dataset(df=validation_data, point_cloud_path=point_cloud_path)
-    INPUT_CHANNELS = 1
-    INPUT_AXIS = 2
+train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
+test = point_cloud_dataset(df=test_data, point_cloud_path=point_cloud_path)
+valid = point_cloud_dataset(df=validation_data, point_cloud_path=point_cloud_path)
+INPUT_CHANNELS = 1
 
 train_loader = torch.utils.data.DataLoader(
     train,
