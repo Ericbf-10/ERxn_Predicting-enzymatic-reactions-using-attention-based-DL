@@ -140,3 +140,5 @@ dmypy.json
 10_voxel_perceiver
 /results/10_enzyme_perceiver
 *.pt
+/results/first_run/10_enzyme_perceiver
+.ipynb_checkpoints

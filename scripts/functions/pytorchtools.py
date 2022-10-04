@@ -97,13 +97,6 @@ def one_hot_encoder(y_list, _encoder=None):
 
     return encoded_ys, encoder
 
-def collate_point_cloud(batch):
-    # batch contains a list of tuples of structure (sequence, target)
-    data = [item[0] for item in batch]
-    data = pack_sequence(data, enforce_sorted=False)
-    targets = [item[1] for item in batch]
-    return [data, targets]
-
 def collate_voxels(batch, add_noise=False, VOXEL_DATA=False):
     (xx, yy) = zip(*batch)
     x_lens = [x.shape for x in xx]
@@ -140,6 +133,28 @@ def collate_voxels(batch, add_noise=False, VOXEL_DATA=False):
 
     return xx_pad, yy_pad, x_lens, y_lens
 
+def collate_point_cloud(batch, max_length=21200):
+    (xx, yy) = zip(*batch)
+    x_lens = [x.shape for x in xx]
+    y_lens = [y.shape for y in yy]
+
+    x_max=max_length
+    y_max = max([y[1] for y in x_lens])
+
+    xx_pad = []
+    yy_pad = []
+    for i in range(len(xx)):
+        x = xx[i]
+        y = yy[i]
+        target = torch.zeros(x_max, y_max)
+        target[:x.shape[0], :x.shape[1]] = x[:,:]
+        target = target[None,:, :] # add batch dim
+        xx_pad.append(target.to(device))
+        yy_pad.append(y.to(device))
+
+    yy_pad = torch.stack(yy).type(torch.float).to(device)
+    xx_pad = torch.stack(xx_pad).type(torch.float).to(device)
+    return xx_pad, yy_pad, x_lens, y_lens
 
 def get_acc(y_pred, y_target, return_classes=False):
     pred_class = [pred.argmax() for pred in y_pred]
