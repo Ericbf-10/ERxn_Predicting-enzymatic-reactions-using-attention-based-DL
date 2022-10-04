@@ -345,7 +345,7 @@ class ProteinEncoder(nn.Module):
         Parameters
         ----------
         x : torch.Tensor
-            Shape `(n_samples, in_chans, enz_shape[0], enz_shape[1])`.
+            Shape `(n_samples, in_chans, num_atoms, num_encoding_dimensions)`.
         Returns
         -------
         logits : torch.Tensor

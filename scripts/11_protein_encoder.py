@@ -61,7 +61,7 @@ LEARNING_RATE = 0.001
 WEIGHT_DECAY = 1e-4
 NUM_EPOCHS = 1000
 PATIENCE = 10
-BATCH_SIZE = 1000
+BATCH_SIZE = 100
 MOMENTUM = 0.9
 PIN_MEMORY = False
 
@@ -118,7 +118,7 @@ early_stopping = EarlyStopping(patience=PATIENCE)
 summary = []
 if RESUME_TRAINING:
     # load model state
-    model.load_state_dict(torch.load(os.path.join(results_dir, f'10_enzyme_perceiver')))
+    model.load_state_dict(torch.load(os.path.join(results_dir, f'10_protein_encoder')))
 
     # continiue summary
     with open(os.path.join(results_dir, '10_summary.txt'), 'r') as f:
@@ -175,7 +175,7 @@ for epoch in range(EPOCH, NUM_EPOCHS):
         summary.append(f'Early stopping after {epoch} epochs')
         break
 
-    torch.save(model.state_dict(), os.path.join(results_dir, f'10_enzyme_perceiver'))
+    torch.save(model.state_dict(), os.path.join(results_dir, f'10_protein_encoder'))
 
     with open(os.path.join(results_dir, '10_summary.txt'), 'w') as f:
         for line in summary:
