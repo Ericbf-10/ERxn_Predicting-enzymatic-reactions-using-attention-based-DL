@@ -181,7 +181,7 @@ for epoch in range(EPOCH, NUM_EPOCHS):
         print('Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f}\tTest Acc: {:.6f} %'.format(epoch, train_loss[-1], test_loss[-1], acc))
 
     if invoke(early_stopping, test_loss[-1], model, implement=True):
-        model.load_state_dict(torch.load('checkpoint.pt'))
+        model.load_state_dict(torch.load(os.path.join(results_dir,'checkpoint.pt')))
         summary.append(f'Early stopping after {epoch} epochs')
         break
 
