@@ -142,3 +142,4 @@ dmypy.json
 *.pt
 /results/first_run/10_enzyme_perceiver
 .ipynb_checkpoints
+checkpoint.pt
