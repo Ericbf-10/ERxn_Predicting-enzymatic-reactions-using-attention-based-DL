@@ -33,7 +33,7 @@ dataset_path = os.path.join(data_dir, 'datasets/09_balanced_data_set.csv')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # load dataset
-dataset = pd.read_csv(dataset_path).sample(frac=0.1)
+dataset = pd.read_csv(dataset_path)
 _, encoder = one_hot_encoder(dataset['EC'].to_list())
 
 # get max length of sequence in dataset - for current data set 21166, set to 21200 in collate function
