@@ -609,7 +609,6 @@ class EnzymeTransformer(nn.Module):
             x = x.flatten(start_dim=1)
             x = self.head(self.norm(x))
             x = self.softmax(x, dim=-1)
-            print(out.shape)
             out[:, i, :] = x
             i += 1
             # TODO: break if end of sentence token is predicted

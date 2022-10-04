@@ -134,7 +134,6 @@ for epoch in range(EPOCH, NUM_EPOCHS):
     model.train()
     for i, (x_train, y_train, _, _) in enumerate(train_loader):
         # attach to device
-        print(x_train.shape)
         x_train = x_train.to(device)
         y_train = y_train.to(device).reshape([len(x_train), -1])
         optimizer.zero_grad()
