@@ -172,7 +172,6 @@ for epoch in range(EPOCH, NUM_EPOCHS):
 
         acc += get_acc(pred, y_test)
 
-
     test_loss.append(batch_loss / len(test_loader))
     acc = acc / len(test_loader)
     # turn if condition on for real run
