@@ -510,6 +510,7 @@ class EnzymeTransformer(nn.Module):
             patch_length=20,
             in_chans=1,
             vocab_size=1000,
+            query_len=100,
             embed_dim=768,
             encoder_depth=6,
             decoder_depth=6,
@@ -611,8 +612,5 @@ class EnzymeTransformer(nn.Module):
             x = self.softmax(x, dim=-1)
             out[:, i, :] = x
             i += 1
-            # TODO: break if end of sentence token is predicted
-            # if x_.argmax() == self.eos_token.argmax():
-            #    break
 
         return out
