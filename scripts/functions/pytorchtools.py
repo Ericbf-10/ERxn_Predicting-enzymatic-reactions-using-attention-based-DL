@@ -176,3 +176,40 @@ def get_acc(y_pred, y_target, return_classes=False):
         return acc, y_hat, y_true
     else:
         return acc
+
+
+def load_progress(model, state_dict, summary):
+    '''Load previous training stage and results to resume training.
+    Parameters
+    ----------
+    summary : str
+        path to summary file
+
+    model : str
+        path to model state dict
+
+    Returns
+    -------
+    model : pytroch model
+        state of a model.
+
+    summary, train_loss, test_loss : list
+        summary and loss of training.
+    '''
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    model.load_state_dict(torch.load(state_dict, map_location=device))
+
+    train_loss = []
+    test_loss = []
+    # continue summary
+    with open(summary, 'r') as f:
+        summary = f.readlines()
+        summary = [s.replace('\n', '') for s in summary]
+        for line in summary:
+            if line.startswith('Train Epoch'):
+                train_loss.append(float(line.split(':')[2].split('\t')[0]))
+                test_loss.append(float(line.split(':')[3].split('\t')[0]))
+                EPOCH = int(line.split(':')[1].split('\t')[0])
+    return model, summary, test_loss, train_loss, EPOCH
