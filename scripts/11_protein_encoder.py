@@ -12,7 +12,7 @@ from functions.customDataset import point_cloud_dataset
 from sklearn.metrics import matthews_corrcoef
 
 
-RESUME_TRAINING = True
+RESUME_TRAINING = False
 
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
@@ -58,7 +58,7 @@ N_CLASSES = len(training_data['y'].to_list()[0])
 LEARNING_RATE = 0.001
 WEIGHT_DECAY = 1e-4
 NUM_EPOCHS = 1000
-PATIENCE = 1
+PATIENCE = 10
 BATCH_SIZE = 100
 MOMENTUM = 0.9
 PIN_MEMORY = False
