@@ -58,7 +58,7 @@ N_CLASSES = len(training_data['y'].to_list()[0])
 LEARNING_RATE = 0.001
 WEIGHT_DECAY = 1e-4
 NUM_EPOCHS = 1000
-PATIENCE = 10
+PATIENCE = 1
 BATCH_SIZE = 100
 MOMENTUM = 0.9
 PIN_MEMORY = False
@@ -164,7 +164,7 @@ for epoch in range(EPOCH, NUM_EPOCHS):
         print('Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f}\tTest Acc: {:.6f} %'.format(epoch, train_loss[-1], test_loss[-1], acc))
 
     if invoke(early_stopping, test_loss[-1], model, implement=True):
-        model.load_state_dict(torch.load(os.path.join(results_dir,'11_protein_encoder')))
+        model.load_state_dict(torch.load(os.path.join(results_dir,'11_protein_encoder'), map_location=device))
         summary.append(f'Early stopping after {epoch} epochs')
         break
 
