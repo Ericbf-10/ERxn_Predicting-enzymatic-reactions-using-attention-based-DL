@@ -7,13 +7,12 @@ import torch.nn as nn
 import sys
 sys.path.append('functions/')
 from functions.protein_encoder import ProteinEncoder
-from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, collate_point_cloud, get_acc
-from functions.customDataset import point_cloud_dataset, voxel_dataset
+from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, collate_point_cloud, get_acc, load_progress
+from functions.customDataset import point_cloud_dataset
 from sklearn.metrics import matthews_corrcoef
-import time
 
-VOXEL_DATA = False # true for voxels, false for point clouds
-RESUME_TRAINING = False
+
+RESUME_TRAINING = True
 
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
@@ -26,7 +25,6 @@ if not os.path.exists(results_dir):
     os.makedirs(results_dir)
 
 # Choose data set
-#dataset_path = os.path.join(data_dir, 'datasets/08_point_cloud_dataset.csv')
 dataset_path = os.path.join(data_dir, 'datasets/09_balanced_data_set.csv')
 
 # use GPU if available
@@ -69,7 +67,6 @@ PIN_MEMORY = False
 train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
 test = point_cloud_dataset(df=test_data, point_cloud_path=point_cloud_path)
 valid = point_cloud_dataset(df=validation_data, point_cloud_path=point_cloud_path)
-INPUT_CHANNELS = 1
 
 train_loader = torch.utils.data.DataLoader(
     train,
@@ -118,17 +115,14 @@ early_stopping = EarlyStopping(patience=PATIENCE)
 summary = []
 if RESUME_TRAINING:
     # load model state
-    model.load_state_dict(torch.load(os.path.join(results_dir, f'10_protein_encoder')))
+    state_dict = os.path.join(results_dir, f'11_protein_encoder')
+    summary_path = os.path.join(results_dir, '11_summary.txt')
+    model, summary, test_loss, train_loss, EPOCH = load_progress(model, state_dict, summary_path)
 
-    # continiue summary
-    with open(os.path.join(results_dir, '10_summary.txt'), 'r') as f:
-        summary = f.readlines()
-        summary = [s.replace('\n') for s in summary]
-        EPOCH = int(summary[-1].split('\t')[0].split(':')[1]) + 1
 else:
     EPOCH = 0
 
-start = time.time()
+
 for epoch in range(EPOCH, NUM_EPOCHS):
     batch_loss = 0
     model.train()
@@ -170,13 +164,13 @@ for epoch in range(EPOCH, NUM_EPOCHS):
         print('Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f}\tTest Acc: {:.6f} %'.format(epoch, train_loss[-1], test_loss[-1], acc))
 
     if invoke(early_stopping, test_loss[-1], model, implement=True):
-        model.load_state_dict(torch.load(os.path.join(results_dir,'checkpoint.pt')))
+        model.load_state_dict(torch.load(os.path.join(results_dir,'11_protein_encoder')))
         summary.append(f'Early stopping after {epoch} epochs')
         break
 
-    torch.save(model.state_dict(), os.path.join(results_dir, f'10_protein_encoder'))
+    torch.save(model.state_dict(), os.path.join(results_dir, f'11_protein_encoder'))
 
-    with open(os.path.join(results_dir, '10_summary.txt'), 'w') as f:
+    with open(os.path.join(results_dir, '11_summary.txt'), 'w') as f:
         for line in summary:
             f.write(str(line) + '\n')
 
@@ -193,7 +187,7 @@ def plot_losses(train_loss, test_loss,burn_in=20):
     plt.legend(frameon=False)
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
-    plt.savefig(os.path.join(results_dir, f'10_losses'))
+    plt.savefig(os.path.join(results_dir, f'11_losses'))
     plt.close()
 
 
@@ -228,6 +222,6 @@ summary.append('\nValidation Acc: ' + str(acc) + ' %')
 summary.append('\nmathews correlation coefficient: ' + str(mcc))
 print(mcc)
 
-with open(os.path.join(results_dir, '10_summary.txt'), 'w') as f:
+with open(os.path.join(results_dir, '11_summary.txt'), 'w') as f:
     for line in summary:
         f.write(str(line) + '\n')

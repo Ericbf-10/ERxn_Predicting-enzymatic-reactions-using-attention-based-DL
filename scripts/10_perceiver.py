@@ -7,7 +7,7 @@ import torch.nn as nn
 from perceiver_pytorch import Perceiver
 import sys
 sys.path.append('functions/')
-from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, collate_voxels, get_acc
+from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, collate_voxels, get_acc, load_progress
 from functions.customDataset import point_cloud_dataset, voxel_dataset
 from sklearn.metrics import matthews_corrcoef, roc_curve, auc
 import time
@@ -127,13 +127,9 @@ early_stopping = EarlyStopping(patience=PATIENCE)
 summary = []
 if RESUME_TRAINING:
     # load model state
-    model.load_state_dict(torch.load(os.path.join(results_dir, f'10_enzyme_perceiver')))
-
-    # continiue summary
-    with open(os.path.join(results_dir, '10_summary.txt'), 'r') as f:
-        summary = f.readlines()
-        summary = [s.replace('\n') for s in summary]
-        EPOCH = int(summary[-1].split('\t')[0].split(':')[1]) + 1
+    state_dict = os.path.join(results_dir, f'10_enzyme_perceiver')
+    summary_path = os.path.join(results_dir, '10_summary.txt')
+    model, summary, test_loss, train_loss, EPOCH = load_progress(model, state_dict, summary_path)
 else:
     EPOCH = 0
 
