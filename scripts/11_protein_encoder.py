@@ -11,8 +11,31 @@ from functions.pytorchtools import EarlyStopping, invoke, one_hot_encoder, colla
 from functions.customDataset import point_cloud_dataset
 from sklearn.metrics import matthews_corrcoef
 
+# Define hyper parameters with Argument Parser
+from argparse import ArgumentParser
 
-RESUME_TRAINING = False
+parser = ArgumentParser(description="ProteinEncoder")
+
+parser.add_argument("-lr", action="store", dest="LEARNING_RATE", type=float, default=0.001, help="Learning Rate (default: 0.001)")
+parser.add_argument("-wd", action="store", dest="WEIGHT_DECAY", type=float, deafult=0.0001, help="Weight Decay (default: 0.0001)")
+parser.add_argument("-epoch", action="store", dest="NUM_EPOCHS", type=int, default=1000, help="Numner of epochs (default: 1000)")
+parser.add_argument("-pati", action="store", dest="PATIENCE", type=int, default=10, help="Patience (default: 10)")
+parser.add_argument("-bs", action="store", dest="BATCH_SIZE", type=int, default=100, help="Batch Size (default: 100)")
+parser.add_argument("-m", action="store", dest="MOMENTUM", type=float, default=0.9, help="Momentum (default: 0.9)")
+parser.add_argument("-pin", action="store_false", dest="PIN_MEMORY", help="Pin Memory (default: False)")
+parser.add_argument("-restrain", action="store_false", dest="RESUME_TRAINING", help="Resume Training (default: False)")
+parser.add_argument("-plen", action="store", dest="PATCH_LENGTH", type=int, default=400, help="Patch Length (default: 400)")
+parser.add_argument("-inchan", action="store", dest="IN_CHANS", type=int, default=1, help="Number of input channels (default: 1)")
+parser.add_argument("-embed", action="store", dest="EMBED_DIM", type=int, default=768, help="Embedding Dimension (default: 768)")
+parser.add_argument("-depth", action="store", dest="DEPTH", type=int, default=12, help="Number of Blocks (default: 12)")
+parser.add_argument("-heads", action="store", dest="N_HEADS", type=int, default=12, help="Number of attention heads (default: 12)")
+parser.add_argument("-mlp", action="store", dest="MLP_RATIO", type=float, default=4.0, help="Hidden dimension of the MLP module (default: 4.0)")
+parser.add_argument("-qkvbias", action="store_true", dest="QKV_BIAS", help="Include bias to Q, K and V projections (default: True)")
+parser.add_argument("-p", action="store", dest="P_DROP", type=float, default=0., help="Dropout probability (default: 0.0)")
+parser.add_argument("-attnp", action="store", dest="ATTN_P", type=float, default=0., help="Dropout probability (default: 0.0)")
+
+args = parser.parse_args()
+RESUME_TRAINING = args.RESUME_TRAINING
 
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
@@ -55,13 +78,22 @@ validation_data['y'], _ = one_hot_encoder(validation_data['EC'].to_list(), _enco
 N_CLASSES = len(training_data['y'].to_list()[0])
 
 # Hyper parameters
-LEARNING_RATE = 0.001
-WEIGHT_DECAY = 1e-4
-NUM_EPOCHS = 1000
-PATIENCE = 10
-BATCH_SIZE = 100
-MOMENTUM = 0.9
-PIN_MEMORY = False
+LEARNING_RATE = args.LEARNING_RATE
+WEIGHT_DECAY = args.WEIGHT_DECAY
+NUM_EPOCHS = args.NUM_EPOCHS
+PATIENCE = args.PATIENCE
+BATCH_SIZE = args.BATCH_SIZE
+MOMENTUM = args.MOMENTUM
+PIN_MEMORY = args.PIN_MEMORY
+PATCH_LENGTH = args.PATCH_LENGTH
+IN_CHANS = args.IN_CHANS
+EMBED_DIM = args.EMBED_DIM
+DEPTH = args.DEPTH
+N_HEADS = args.N_HEADS
+MLP_RATIO = args.MLP_RATIO
+QKV_BIAS = args.QKV_BIAS
+P_DROP = args.P_DROP
+ATTN_P = args.ATTN_P
 
 # dataset and data loader
 train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
@@ -89,16 +121,16 @@ valid_loader = torch.utils.data.DataLoader(
 
 model = ProteinEncoder(
     enz_shape=(MAX_LENGTH,7),
-    patch_length=400,
-    in_chans=1,
+    patch_length=PATCH_LENGTH,
+    in_chans=IN_CHANS,
     n_classes=N_CLASSES,
-    embed_dim=768,
-    depth=12,
-    n_heads=12,
-    mlp_ratio=4.,
-    qkv_bias=True,
-    p=0.,
-    attn_p=0.
+    embed_dim=EMBED_DIM,
+    depth=DEPTH,
+    n_heads=N_HEADS,
+    mlp_ratio=MLP_RATIO,
+    qkv_bias=QKV_BIAS,
+    p=P_DROP,
+    attn_p=ATTN_P
 ).to(device)
 
 # training loop
