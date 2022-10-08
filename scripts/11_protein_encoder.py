@@ -25,7 +25,6 @@ parser.add_argument("-m", action="store", dest="MOMENTUM", type=float, default=0
 parser.add_argument("-pin", action="store_false", dest="PIN_MEMORY", help="Pin Memory (default: False)")
 parser.add_argument("-restrain", action="store_false", dest="RESUME_TRAINING", help="Resume Training (default: False)")
 parser.add_argument("-plen", action="store", dest="PATCH_LENGTH", type=int, default=400, help="Patch Length (default: 400)")
-parser.add_argument("-inchan", action="store", dest="IN_CHANS", type=int, default=1, help="Number of input channels (default: 1)")
 parser.add_argument("-embed", action="store", dest="EMBED_DIM", type=int, default=768, help="Embedding Dimension (default: 768)")
 parser.add_argument("-depth", action="store", dest="DEPTH", type=int, default=12, help="Number of Blocks (default: 12)")
 parser.add_argument("-heads", action="store", dest="N_HEADS", type=int, default=12, help="Number of attention heads (default: 12)")
@@ -86,7 +85,6 @@ BATCH_SIZE = args.BATCH_SIZE
 MOMENTUM = args.MOMENTUM
 PIN_MEMORY = args.PIN_MEMORY
 PATCH_LENGTH = args.PATCH_LENGTH
-IN_CHANS = args.IN_CHANS
 EMBED_DIM = args.EMBED_DIM
 DEPTH = args.DEPTH
 N_HEADS = args.N_HEADS
@@ -122,7 +120,7 @@ valid_loader = torch.utils.data.DataLoader(
 model = ProteinEncoder(
     enz_shape=(MAX_LENGTH,7),
     patch_length=PATCH_LENGTH,
-    in_chans=IN_CHANS,
+    in_chans=1,
     n_classes=N_CLASSES,
     embed_dim=EMBED_DIM,
     depth=DEPTH,
