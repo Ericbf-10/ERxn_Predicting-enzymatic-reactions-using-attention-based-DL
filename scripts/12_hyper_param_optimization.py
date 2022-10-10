@@ -4,8 +4,7 @@
 ## IMPORT LIBRARIES ##
 import os
 import subprocess
-
-## FUNCTIONS ##
+import time
 
 ## MAIN CODE ##
 
@@ -81,6 +80,10 @@ hpc_path = os.path.join(script_path, '../HPC/')
 for i in range(len(hyper_param_list)):
     for value in hyper_param_list[i]:
         out_file = "summary" + hyper_param_string[i] + "=" + str(value)
+        job = subprocess.run(['ls summary'], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+        outfile_list = job.stdout.split('\n')
+        outfile_list.pop()
+        if out_file not in outfile_list:
         job = subprocess.run(["bash " + hpc_path + "hyperparam.sh " + hyper_param_string[i] + " " + str(value) + " -fout " \
                               + out_file],
                              shell=True, stdout=subprocess.PIPE, universal_newlines=True)
