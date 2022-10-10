@@ -74,9 +74,12 @@ hyper_param_string.append("-heads")
 #hyper_param_list.append(PIN_MEMORY)
 #hyper_param_string.append("-pin")
 
+script_path = os.path.dirname(__file__)
+hpc_path = os.path.join(script_path, '../HPC/')
+
 # Submit a job in the HPC queue for each value of each hyperparameter
 for i in range(len(hyper_param_list)):
     for value in hyper_param_list[i]:
-        job = subprocess.run(["bash hyperparam.sh " + hyper_param_string[i] + " " + str(value) + " -fout " \
+        job = subprocess.run(["bash " + hpc_path + "hyperparam.sh " + hyper_param_string[i] + " " + str(value) + " -fout " \
                               + "summary" + hyper_param_string[i] + "=" + str(value) + ".txt"],
                              shell=True, stdout=subprocess.PIPE, universal_newlines=True)
