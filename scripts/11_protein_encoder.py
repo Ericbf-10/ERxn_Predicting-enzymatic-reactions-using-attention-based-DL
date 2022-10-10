@@ -35,6 +35,7 @@ parser.add_argument("-fout", action="store", dest="out_file", type=str, help="Ou
 
 args = parser.parse_args()
 out_file = args.out_file
+plot_file = out_file + "_losses"
 
 RESUME_TRAINING = False
 
@@ -223,7 +224,7 @@ def plot_losses(train_loss, test_loss,burn_in=20):
     plt.legend(frameon=False)
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
-    plt.savefig(os.path.join(results_dir, f'11_losses'))
+    plt.savefig(os.path.join(hyperparam_dir, plot_file))
     plt.close()
 
 
@@ -263,7 +264,7 @@ header = "The parameters used: " + "-lr=" + str(LEARNING_RATE) + "; -wd=" + str(
          + "; -plen=" + str(PATCH_LENGTH) + "; -embed=" + str(EMBED_DIM) + "; -depth=" + str(DEPTH) + "; -heads=" + str(N_HEADS) \
          + "; -mlp=" + str(MLP_RATIO) + "; -qkvbias=" + str(QKV_BIAS) + "; -p=" + str(P_DROP) + "; -attnp=" + str(ATTN_P)
 
-with open(os.path.join(hyperparam_dir, 'out_file'), 'w') as f:
+with open(os.path.join(hyperparam_dir, out_file + ".txt"), 'w') as f:
     f.write(header + '\n' + '\n')
     for line in summary:
         f.write(str(line) + '\n')

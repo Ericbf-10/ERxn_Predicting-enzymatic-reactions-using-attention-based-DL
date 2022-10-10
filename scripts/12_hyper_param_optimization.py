@@ -80,6 +80,7 @@ hpc_path = os.path.join(script_path, '../HPC/')
 # Submit a job in the HPC queue for each value of each hyperparameter
 for i in range(len(hyper_param_list)):
     for value in hyper_param_list[i]:
+        out_file = "summary" + hyper_param_string[i] + "=" + str(value)
         job = subprocess.run(["bash " + hpc_path + "hyperparam.sh " + hyper_param_string[i] + " " + str(value) + " -fout " \
-                              + "summary" + hyper_param_string[i] + "=" + str(value) + ".txt"],
+                              + out_file],
                              shell=True, stdout=subprocess.PIPE, universal_newlines=True)
