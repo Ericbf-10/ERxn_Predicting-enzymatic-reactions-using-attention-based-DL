@@ -23,18 +23,20 @@ parser.add_argument("-pati", action="store", dest="PATIENCE", type=int, default=
 parser.add_argument("-bs", action="store", dest="BATCH_SIZE", type=int, default=100, help="Batch Size (default: 100)")
 parser.add_argument("-m", action="store", dest="MOMENTUM", type=float, default=0.9, help="Momentum (default: 0.9)")
 parser.add_argument("-pin", action="store_false", dest="PIN_MEMORY", help="Pin Memory (default: False)")
-parser.add_argument("-restrain", action="store_false", dest="RESUME_TRAINING", help="Resume Training (default: False)")
 parser.add_argument("-plen", action="store", dest="PATCH_LENGTH", type=int, default=400, help="Patch Length (default: 400)")
 parser.add_argument("-embed", action="store", dest="EMBED_DIM", type=int, default=768, help="Embedding Dimension (default: 768)")
 parser.add_argument("-depth", action="store", dest="DEPTH", type=int, default=12, help="Number of Blocks (default: 12)")
 parser.add_argument("-heads", action="store", dest="N_HEADS", type=int, default=12, help="Number of attention heads (default: 12)")
 parser.add_argument("-mlp", action="store", dest="MLP_RATIO", type=float, default=4.0, help="Hidden dimension of the MLP module (default: 4.0)")
 parser.add_argument("-qkvbias", action="store_true", dest="QKV_BIAS", help="Include bias to Q, K and V projections (default: True)")
-parser.add_argument("-p", action="store", dest="P_DROP", type=float, default=0., help="Dropout probability (default: 0.0)")
-parser.add_argument("-attnp", action="store", dest="ATTN_P", type=float, default=0., help="Dropout probability (default: 0.0)")
+parser.add_argument("-p", action="store", dest="P_DROP", type=float, default=0.1, help="Dropout probability (default: 0.1)")
+parser.add_argument("-attnp", action="store", dest="ATTN_P", type=float, default=0.1, help="Dropout probability (default: 0.1)")
+parser.add_argument("-fout", action="store", dest="out_file", type=str, help="Output summary file")
 
 args = parser.parse_args()
-RESUME_TRAINING = args.RESUME_TRAINING
+out_file = args.out_file
+
+RESUME_TRAINING = False
 
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
@@ -252,6 +254,12 @@ summary.append('\nValidation Acc: ' + str(acc) + ' %')
 summary.append('\nmathews correlation coefficient: ' + str(mcc))
 print(mcc)
 
-with open(os.path.join(results_dir, '11_summary.txt'), 'w') as f:
+header = "The parameters used: " + "-lr=" + str(LEARNING_RATE) + "; -wd=" + str(WEIGHT_DECAY) + "; -epoch=" + str(NUM_EPOCHS) \
+         + "; -pati=" + str(PATIENCE) + "; -bs=" + str(BATCH_SIZE) + "; -m=" + str(MOMENTUM) + "; -pin=" + str(PIN_MEMORY) \
+         + "; -plen=" + str(PATCH_LENGTH) + "; -embed=" + str(EMBED_DIM) + "; -depth=" + str(DEPTH) + "; -heads=" + str(N_HEADS) \
+         + "; -mlp=" + str(MLP_RATIO) + "; -qkvbias=" + str(QKV_BIAS) + "; -p=" + str(P_DROP) + "; -attnp=" + str(ATTN_P)
+
+with open(os.path.join(results_dir, 'out_file'), 'w') as f:
+    f.write(header + '\n' + '\n')
     for line in summary:
         f.write(str(line) + '\n')
