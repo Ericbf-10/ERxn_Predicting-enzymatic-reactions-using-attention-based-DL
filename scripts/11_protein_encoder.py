@@ -44,9 +44,13 @@ processed_data_dir = os.path.join(data_dir, 'processed')
 pdb_files_path = os.path.join(data_dir, 'pdbs')
 point_cloud_path = os.path.join(data_dir, 'point_cloud_dataset')
 results_dir = os.path.join(script_path, '../results')
+hyperparam_dir = os.path.join(results_dir, '/hyper_param_benchmark')
 
 if not os.path.exists(results_dir):
     os.makedirs(results_dir)
+
+if not os.path.exists(hyperparam_dir):
+    os.makedirs(hyperparam_dir)
 
 # Choose data set
 dataset_path = os.path.join(data_dir, 'datasets/09_balanced_data_set.csv')
@@ -259,7 +263,7 @@ header = "The parameters used: " + "-lr=" + str(LEARNING_RATE) + "; -wd=" + str(
          + "; -plen=" + str(PATCH_LENGTH) + "; -embed=" + str(EMBED_DIM) + "; -depth=" + str(DEPTH) + "; -heads=" + str(N_HEADS) \
          + "; -mlp=" + str(MLP_RATIO) + "; -qkvbias=" + str(QKV_BIAS) + "; -p=" + str(P_DROP) + "; -attnp=" + str(ATTN_P)
 
-with open(os.path.join(results_dir, 'out_file'), 'w') as f:
+with open(os.path.join(hyperparam_dir, 'out_file'), 'w') as f:
     f.write(header + '\n' + '\n')
     for line in summary:
         f.write(str(line) + '\n')
