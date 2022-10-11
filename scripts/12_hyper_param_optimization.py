@@ -79,11 +79,17 @@ hpc_path = os.path.join(script_path, '../HPC/')
 # Submit a job in the HPC queue for each value of each hyperparameter
 for i in range(len(hyper_param_list)):
     for value in hyper_param_list[i]:
+        flag = True
         out_file = "summary" + hyper_param_string[i] + "=" + str(value)
-        job = subprocess.run(['ls summary'], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
-        outfile_list = job.stdout.split('\n')
-        outfile_list.pop()
-        if out_file not in outfile_list:
-        job = subprocess.run(["bash " + hpc_path + "hyperparam.sh " + hyper_param_string[i] + " " + str(value) + " -fout " \
-                              + out_file],
-                             shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+        job = subprocess.run(
+            ["bash " + hpc_path + "hyperparam.sh " + hyper_param_string[i] + " " + str(value) + " -fout " \
+             + out_file], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+        while flag:
+            job = subprocess.run(['ls summary'], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+            outfile_list = job.stdout.split('\n')
+            outfile_list.pop()
+            if out_file not in outfile_list:
+                time.sleep(1800)
+            else:
+                flag = False
+
