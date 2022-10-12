@@ -16,8 +16,8 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser(description="ProteinEncoder")
 
-parser.add_argument("-lr", action="store", dest="LEARNING_RATE", type=float, default=0.001, help="Learning Rate (default: 0.001)")
-parser.add_argument("-wd", action="store", dest="WEIGHT_DECAY", type=float, deafult=0.0001, help="Weight Decay (default: 0.0001)")
+parser.add_argument("-lr", action="store", dest="LEARNING_RATE", type=float, default=0.000001, help="Learning Rate (default: 0.000001)")
+parser.add_argument("-wd", action="store", dest="WEIGHT_DECAY", type=float, deafult=0.01, help="Weight Decay (default: 0.01)")
 parser.add_argument("-epoch", action="store", dest="NUM_EPOCHS", type=int, default=1000, help="Numner of epochs (default: 1000)")
 parser.add_argument("-pati", action="store", dest="PATIENCE", type=int, default=10, help="Patience (default: 10)")
 parser.add_argument("-bs", action="store", dest="BATCH_SIZE", type=int, default=100, help="Batch Size (default: 100)")
@@ -32,6 +32,7 @@ parser.add_argument("-qkvbias", action="store_true", dest="QKV_BIAS", help="Incl
 parser.add_argument("-p", action="store", dest="P_DROP", type=float, default=0.1, help="Dropout probability (default: 0.1)")
 parser.add_argument("-attnp", action="store", dest="ATTN_P", type=float, default=0.1, help="Dropout probability (default: 0.1)")
 parser.add_argument("-fout", action="store", dest="out_file", type=str, help="Output summary file")
+parser.add_argument("-optim", action="store", dest="OPTIM", type=str, default="adam", help="Optimizer to use. Choose between: [sgd, adam] (default: adam)")
 
 args = parser.parse_args()
 out_file = args.out_file
@@ -99,6 +100,7 @@ MLP_RATIO = args.MLP_RATIO
 QKV_BIAS = args.QKV_BIAS
 P_DROP = args.P_DROP
 ATTN_P = args.ATTN_P
+OPTIM = args.OPTIM
 
 # dataset and data loader
 train = point_cloud_dataset(df=training_data, point_cloud_path=point_cloud_path)
@@ -138,12 +140,21 @@ model = ProteinEncoder(
     attn_p=ATTN_P
 ).to(device)
 
-# training loop
+## Training loop
+# Loss
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(),
+# Optimizer
+if OPTIM == "adam":
+    optimizer = torch.optim.Adam(model.parameters(),
+                                lr=LEARNING_RATE,
+                                weight_decay=WEIGHT_DECAY)
+elif OPTIM == "sgd":
+    optimizer = torch.optim.SGD(model.parameters(),
                             lr=LEARNING_RATE,
                             weight_decay=WEIGHT_DECAY,
                             momentum=MOMENTUM)
+else:
+    sys.exit("Optimizer not available, please choose between sgd or adam.")
 
 train_loss, test_loss = [], []
 

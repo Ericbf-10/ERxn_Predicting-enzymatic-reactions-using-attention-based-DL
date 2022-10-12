@@ -13,7 +13,7 @@ hyper_param_list = []
 hyper_param_string = []
 
 # Define ranges that make sense for each hyperparameter
-#LEARNING_RATE = [0.0001, 0.001, 0.01, 0.1] # Default=0.001
+#LEARNING_RATE = [0.0001, 0.001, 0.01, 0.1] # Default=0.000001
 #hyper_param_list.append(LEARNING_RATE)
 #hyper_param_string.append("-lr")
 
@@ -45,11 +45,11 @@ EMBED_DIM = [1024, 768, 512] # Default=768
 hyper_param_list.append(EMBED_DIM)
 hyper_param_string.append("-embed")
 
-DEPTH = [24, 12, 6] # Default=12
+DEPTH = [30, 24, 12] # Default=12
 hyper_param_list.append(DEPTH)
 hyper_param_string.append("-depth")
 
-N_HEADS = [24, 12, 6] # Default=12
+N_HEADS = [20, 16, 14] # Default=12
 hyper_param_list.append(N_HEADS)
 hyper_param_string.append("-heads")
 
