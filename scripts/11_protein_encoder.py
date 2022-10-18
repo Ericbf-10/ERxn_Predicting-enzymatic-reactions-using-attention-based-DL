@@ -17,7 +17,7 @@ from argparse import ArgumentParser
 parser = ArgumentParser(description="ProteinEncoder")
 
 parser.add_argument("-lr", action="store", dest="LEARNING_RATE", type=float, default=0.000001, help="Learning Rate (default: 0.000001)")
-parser.add_argument("-wd", action="store", dest="WEIGHT_DECAY", type=float, deafult=0.01, help="Weight Decay (default: 0.01)")
+parser.add_argument("-wd", action="store", dest="WEIGHT_DECAY", type=float, default=0.01, help="Weight Decay (default: 0.01)")
 parser.add_argument("-epoch", action="store", dest="NUM_EPOCHS", type=int, default=1000, help="Numner of epochs (default: 1000)")
 parser.add_argument("-pati", action="store", dest="PATIENCE", type=int, default=10, help="Patience (default: 10)")
 parser.add_argument("-bs", action="store", dest="BATCH_SIZE", type=int, default=100, help="Batch Size (default: 100)")
