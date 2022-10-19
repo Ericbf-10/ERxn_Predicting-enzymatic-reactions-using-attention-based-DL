@@ -51,8 +51,8 @@ hyperparam_dir = os.path.join(results_dir, '/hyper_param_benchmark')
 if not os.path.exists(results_dir):
     os.makedirs(results_dir)
 
-if not os.path.exists(hyperparam_dir):
-    os.makedirs(hyperparam_dir)
+#if not os.path.exists(hyperparam_dir):
+#    os.makedirs(hyperparam_dir)
 
 # Choose data set
 dataset_path = os.path.join(data_dir, 'datasets/09_balanced_data_set.csv')
@@ -181,7 +181,7 @@ for epoch in range(EPOCH, NUM_EPOCHS):
         optimizer.zero_grad()
 
         # forward + backward + optimize
-        outputs = model(x_train)
+        outputs, _ = model(x_train)
         x_train.detach()
         loss = criterion(outputs, y_train)
         loss.backward()
@@ -198,7 +198,7 @@ for epoch in range(EPOCH, NUM_EPOCHS):
         x_test = x_test.to(device)
         y_test = y_test.to(device).reshape([len(x_test), -1])
 
-        pred = model(x_test)
+        pred, _ = model(x_test)
         loss = criterion(pred, y_test)
         batch_loss += loss.data
 
@@ -253,7 +253,7 @@ with torch.no_grad():
         x_valid = x_valid.to(device)
         y_valid = y_valid.to(device).reshape([len(y_valid), -1])
 
-        pred = model(x_valid)
+        pred, _ = model(x_valid)
 
         accuracy, y_hat, y_true = get_acc(pred, y_valid, return_classes=True)
         if i == 0:

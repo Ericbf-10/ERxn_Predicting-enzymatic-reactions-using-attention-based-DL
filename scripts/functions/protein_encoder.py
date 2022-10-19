@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 class PatchEmbed(nn.Module):
     """Split enzyme into patches and then embed them.
     Parameters
@@ -32,10 +33,10 @@ class PatchEmbed(nn.Module):
         self.n_patches = enz_shape[0] // patch_length
 
         self.proj = nn.Conv2d(
-                in_chans,
-                embed_dim,
-                kernel_size=self.patch_size,
-                stride=patch_length,
+            in_chans,
+            embed_dim,
+            kernel_size=self.patch_size,
+            stride=patch_length,
         )
 
     def forward(self, x):
@@ -50,8 +51,8 @@ class PatchEmbed(nn.Module):
             Shape `(n_samples, n_patches, embed_dim)`.
         """
         x = self.proj(
-                x
-            )  # (n_samples, embed_dim, n_patches ** 0.5, n_patches ** 0.5)
+            x
+        )  # (n_samples, embed_dim, n_patches ** 0.5, n_patches ** 0.5)
         x = x.flatten(2)  # (n_samples, embed_dim, n_patches)
         x = x.transpose(1, 2)  # (n_samples, n_patches, embed_dim)
         return x
@@ -311,6 +312,8 @@ class ProteinEncoder(nn.Module):
     ):
         super().__init__()
 
+        self.enz_shape = enz_shape
+
         self.patch_embed = PatchEmbed(
             enz_shape=enz_shape,
             patch_length=patch_length,
@@ -338,7 +341,8 @@ class ProteinEncoder(nn.Module):
         )
 
         self.norm = nn.LayerNorm(embed_dim, eps=1e-6)
-        self.head = nn.Linear(embed_dim, n_classes)
+        self.reconstruct = nn.Linear(embed_dim, patch_length * enz_shape[1])
+        self.head = nn.Linear(embed_dim, n_classes)  # for classification
 
     def forward(self, x):
         """Run the forward pass.
@@ -367,6 +371,11 @@ class ProteinEncoder(nn.Module):
         x = self.norm(x)
 
         cls_token_final = x[:, 0]  # just the CLS token
-        x = self.head(cls_token_final)
+        representations = x[:, 1:]  # the representations
 
-        return x
+        recon = self.reconstruct(representations)
+        recon = recon.view(recon.size(0), 1, self.enz_shape[0], self.enz_shape[1])
+
+        x_cls = self.head(cls_token_final)
+
+        return x_cls, recon
