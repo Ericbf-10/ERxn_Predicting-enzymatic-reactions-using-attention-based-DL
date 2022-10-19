@@ -31,7 +31,7 @@ parser.add_argument("-mlp", action="store", dest="MLP_RATIO", type=float, defaul
 parser.add_argument("-qkvbias", action="store_true", dest="QKV_BIAS", help="Include bias to Q, K and V projections (default: True)")
 parser.add_argument("-p", action="store", dest="P_DROP", type=float, default=0.1, help="Dropout probability (default: 0.1)")
 parser.add_argument("-attnp", action="store", dest="ATTN_P", type=float, default=0.1, help="Dropout probability (default: 0.1)")
-parser.add_argument("-fout", action="store", dest="out_file", type=str, help="Output summary file")
+parser.add_argument("-fout", action="store", dest="out_file", type=str, default='test.out', help="Output summary file")
 parser.add_argument("-optim", action="store", dest="OPTIM", type=str, default="adam", help="Optimizer to use. Choose between: [sgd, adam] (default: adam)")
 
 args = parser.parse_args()
