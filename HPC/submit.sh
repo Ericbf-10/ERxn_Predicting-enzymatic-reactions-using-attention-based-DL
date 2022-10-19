@@ -42,4 +42,5 @@ pip install requests
 pip3 install -U scikit-learn
 pip install perceiver-pytorch
 
-python3 /zhome/4c/8/164840/projects/ERxn/scripts/11_protein_encoder.py
+#python3 /zhome/4c/8/164840/projects/ERxn/scripts/11_protein_encoder.py
+python3 /zhome/4c/8/164840/projects/ERxn/scripts/10_protein_autoencoder.py
