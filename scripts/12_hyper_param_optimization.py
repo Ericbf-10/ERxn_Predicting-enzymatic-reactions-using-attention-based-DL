@@ -41,7 +41,7 @@ PATCH_LENGTH = [400, 200, 100] # Default=400
 hyper_param_list.append(PATCH_LENGTH)
 hyper_param_string.append("-plen")
 
-EMBED_DIM = [1024, 768, 512] # Default=768
+EMBED_DIM = [1075, 768, 504] # Default=768; All of them are divisible by 12 (default N_HEADS)
 hyper_param_list.append(EMBED_DIM)
 hyper_param_string.append("-embed")
 
@@ -49,7 +49,7 @@ DEPTH = [30, 24, 12] # Default=12
 hyper_param_list.append(DEPTH)
 hyper_param_string.append("-depth")
 
-N_HEADS = [20, 16, 14] # Default=12
+N_HEADS = [24, 16, 12] # Default=12; All of them divisors of 768 (default EMBED_DIM)
 hyper_param_list.append(N_HEADS)
 hyper_param_string.append("-heads")
 
