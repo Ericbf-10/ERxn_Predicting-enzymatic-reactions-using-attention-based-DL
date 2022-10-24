@@ -46,7 +46,7 @@ processed_data_dir = os.path.join(data_dir, 'processed')
 pdb_files_path = os.path.join(data_dir, 'pdbs')
 point_cloud_path = os.path.join(data_dir, 'point_cloud_dataset')
 results_dir = os.path.join(script_path, '../results')
-hyperparam_dir = os.path.join(results_dir, '/hyper_param_benchmark')
+hyperparam_dir = os.path.join(results_dir, 'hyper_param_benchmark')
 
 if not os.path.exists(results_dir):
     os.makedirs(results_dir)

@@ -41,10 +41,6 @@ PATCH_LENGTH = [400, 200, 100] # Default=400
 hyper_param_list.append(PATCH_LENGTH)
 hyper_param_string.append("-plen")
 
-EMBED_DIM = [1075, 768, 504] # Default=768; All of them are divisible by 12 (default N_HEADS)
-hyper_param_list.append(EMBED_DIM)
-hyper_param_string.append("-embed")
-
 DEPTH = [30, 24, 12] # Default=12
 hyper_param_list.append(DEPTH)
 hyper_param_string.append("-depth")
@@ -52,6 +48,10 @@ hyper_param_string.append("-depth")
 N_HEADS = [24, 16, 12] # Default=12; All of them divisors of 768 (default EMBED_DIM)
 hyper_param_list.append(N_HEADS)
 hyper_param_string.append("-heads")
+
+EMBED_DIM = [504, 768, 1075] # Default=768; All of them are divisible by 12 (default N_HEADS)
+hyper_param_list.append(EMBED_DIM)
+hyper_param_string.append("-embed")
 
 #MLP_RATIO = [8.0, 6.0, 4.0, 2.0] # Default=4.0
 #hyper_param_list.append(MLP_RATIO)
@@ -74,22 +74,25 @@ hyper_param_string.append("-heads")
 #hyper_param_string.append("-pin")
 
 script_path = os.path.dirname(__file__)
-hpc_path = os.path.join(script_path, '../HPC/')
+results_path = os.path.join(script_path, "../results/hyper_param_benchmark")
+hpc_path = os.path.join(script_path, '../HPC/hyperparam.sh')
 
 # Submit a job in the HPC queue for each value of each hyperparameter
 for i in range(len(hyper_param_list)):
     for value in hyper_param_list[i]:
         flag = True
         out_file = "summary" + hyper_param_string[i] + "=" + str(value)
-        job = subprocess.run(
-            ["bash " + hpc_path + "hyperparam.sh " + hyper_param_string[i] + " " + str(value) + " -fout " \
-             + out_file], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+        job1 = subprocess.Popen(["bash", hpc_path, hyper_param_string[i], str(value), "-fout", out_file],
+                              stderr=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True)
+        (out, err) = job1.communicate() # Only for debugging purposes
         while flag:
-            job = subprocess.run(['ls summary'], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
-            outfile_list = job.stdout.split('\n')
+            job2 = subprocess.Popen(["ls", results_path],
+                                 stderr=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True)
+            (out, err) = job2.communicate()
+            outfile_list = out.split('\n')
             outfile_list.pop()
+            out_file = out_file + ".txt"
             if out_file not in outfile_list:
-                time.sleep(1800)
+                time.sleep(5)
             else:
                 flag = False
-
