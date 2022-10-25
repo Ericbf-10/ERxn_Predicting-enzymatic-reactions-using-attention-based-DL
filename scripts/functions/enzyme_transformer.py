@@ -314,9 +314,7 @@ class MLP(nn.Module):
         torch.Tensor
             Shape `(n_samples, n_patches +1, out_features)`
         """
-        x = self.fc1(
-            x
-        )  # (n_samples, n_patches + 1, hidden_features)
+        x = self.fc1(x)  # (n_samples, n_patches + 1, hidden_features)
         x = self.act(x)  # (n_samples, n_patches + 1, hidden_features)
         x = self.drop(x)  # (n_samples, n_patches + 1, hidden_features)
         x = self.fc2(x)  # (n_samples, n_patches + 1, out_features)
@@ -539,6 +537,7 @@ class EnzymeTransformer(nn.Module):
         self.pos_embed = nn.Parameter(
             torch.zeros(1, self.patch_embed.n_patches, embed_dim)
         )  # learned embedding
+
         self.pos_embed_out = nn.Parameter(
             torch.zeros(1, self.out_embed.n_patches, embed_dim)
         )  # learned embedding

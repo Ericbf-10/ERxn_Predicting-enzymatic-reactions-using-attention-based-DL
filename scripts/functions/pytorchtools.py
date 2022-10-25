@@ -133,7 +133,7 @@ def collate_voxels(batch, add_noise=False, VOXEL_DATA=False):
 
     return xx_pad, yy_pad, x_lens, y_lens
 
-def collate_point_cloud(batch, max_length=21200):
+def collate_point_cloud(batch, max_length=10000):
     (xx, yy) = zip(*batch)
     x_lens = [x.shape for x in xx]
     y_lens = [y.shape for y in yy]

@@ -11,6 +11,8 @@ uniprot_and_EC_path = os.path.join(processed_data_dir, '02_uniprotID_and_EC_redu
 dataset_dir = os.path.join(data_dir, 'datasets')
 dest = os.path.join(data_dir, 'point_cloud_dataset')
 
+MAX_LENGTH = 10000
+
 def get_point_cloud(pdb_file):
     """
     read a pdb file, extract atom coordinates and type and save them as Mx4x2 vector
@@ -67,11 +69,11 @@ for file in pdb_file_names:
         file = os.path.join(pdb_files_path, file)
         EC_number = uniprot_and_EC_data[uniprot_and_EC_data['protein'] == protein_name]['EC'].values[0]
         point_cloud = get_point_cloud(file)
-        point_cloud_path = os.path.join(protein_name + '.txt')
-
-        point_clouds.append(point_cloud_path)
-        EC_numbers.append(EC_number)
-        np.savetxt(point_cloud_path, point_cloud, fmt='%1.3f')
+        point_cloud_path = protein_name + '.txt'
+        if point_cloud.shape[0] <= MAX_LENGTH:
+            point_clouds.append(point_cloud_path)
+            EC_numbers.append(EC_number)
+            np.savetxt(os.path.join(dest, point_cloud_path), point_cloud, fmt='%1.3f')
 
     except:
         pass

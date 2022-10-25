@@ -8,7 +8,7 @@
 ### -- specify queue -- voltash cabgpu gpuv100
 #BSUB -q cabgpu
 ### -- set walltime limit: hh:mm --
-#BSUB -W 168:00
+#BSUB -W 200:00
 ### -- Select the resources: 1 gpu in exclusive process mode --:mode=exclusive_process
 #BSUB -gpu "num=1:mode=exclusive_process"
 ## --- select a GPU with 32gb----
@@ -42,5 +42,6 @@ pip install requests
 pip3 install -U scikit-learn
 pip install perceiver-pytorch
 
-#python3 /zhome/4c/8/164840/projects/ERxn/scripts/11_protein_encoder.py
-python3 /zhome/4c/8/164840/projects/ERxn/scripts/10_protein_autoencoder.py
+
+python3 /zhome/4c/8/164840/projects/ERxn/scripts/12_hyper_param_optimization.py
+#python3 /zhome/4c/8/164840/projects/ERxn/scripts/10_protein_autoencoder.py

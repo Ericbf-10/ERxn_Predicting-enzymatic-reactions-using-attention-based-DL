@@ -65,7 +65,7 @@ dataset = pd.read_csv(dataset_path)
 _, encoder = one_hot_encoder(dataset['EC'].to_list())
 
 # get max length of sequence in dataset - for current data set 21166, set to 21200 in collate function
-MAX_LENGTH = 21200 # Change that in the collate function as well if needed
+MAX_LENGTH = 10000 # Change that in the collate function as well if needed
 # for file in dataset['protein']:
 #     path = point_cloud_path + '/' + file
 #     x = np.loadtxt(path)
