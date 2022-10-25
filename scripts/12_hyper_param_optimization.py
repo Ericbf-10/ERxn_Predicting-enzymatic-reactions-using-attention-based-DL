@@ -82,12 +82,10 @@ for i in range(len(hyper_param_list)):
     for value in hyper_param_list[i]:
         flag = True
         out_file = "summary" + hyper_param_string[i] + "=" + str(value)
-        job1 = subprocess.Popen(["bsub <", hpc_path, hyper_param_string[i], str(value), "-fout", out_file],
-                              stderr=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True)
-        (out, err) = job1.communicate() # Only for debugging purposes
+        job1 = subprocess.Popen(["bsub <", hpc_path, hyper_param_string[i], str(value), "-fout", out_file], stderr=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True)
+        #(out, err) = job1.communicate() # Only for debugging purposes
         while flag:
-            job2 = subprocess.Popen(["ls", results_path],
-                                 stderr=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True)
+            job2 = subprocess.Popen(["ls", results_path], stderr=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True)
             (out, err) = job2.communicate()
             outfile_list = out.split('\n')
             outfile_list.pop()
