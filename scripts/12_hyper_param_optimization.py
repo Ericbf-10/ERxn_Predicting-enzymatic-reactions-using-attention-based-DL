@@ -93,6 +93,6 @@ for i in range(len(hyper_param_list)):
             outfile_list.pop()
             out_file = out_file + ".txt"
             if out_file not in outfile_list:
-                time.sleep(1800)
+                time.sleep(180)
             else:
                 flag = False
