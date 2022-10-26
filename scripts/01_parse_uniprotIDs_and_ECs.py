@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import re
 
 script_path = os.path.dirname(__file__)
 data_dir = os.path.join(script_path, '../data')
@@ -18,12 +19,15 @@ with open(raw_data_file, 'r') as f:
             ID_and_uniprot[ID] = []
 
         if line.startswith('DR'):
-            if len(line[5:11]) > 1:
-                ID_and_uniprot[ID].append(line[5:11])
-            if len(line[27:33]) > 1:
-                ID_and_uniprot[ID].append(line[5:11])
-            if len(line[49:55]) > 1:
-                ID_and_uniprot[ID].append(line[5:11])
+            result_list = re.findall(r"\s\w+,", line)
+            if result_list is not None: 
+                result_list = "".join(result_list)
+                result_list = re.sub(r" ", "", result_list, count = 0)
+                result_list = result_list.split(",")
+                for result in result_list:
+                    if len(result) > 2: 
+                        ID_and_uniprot[ID].append(result)
+                result_list = list()
 
 IDs = []
 ECs = []
