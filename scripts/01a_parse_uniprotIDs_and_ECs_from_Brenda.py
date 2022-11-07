@@ -27,6 +27,7 @@ with open(raw_data_file, 'r') as f:
         ID_result = re.findall('^ID\s([0-9\.]+)', line)
         if ID_result is not None and len(ID_result) != 0 :
                 ID_flag = True
+                uniprot_results = list()
                 ID = ID_result[0]
                 ID_and_uniprot[ID] = []
                 ID_and_reaction[ID] = []
@@ -43,7 +44,7 @@ with open(raw_data_file, 'r') as f:
             for protein in uniprot_results: 
                 proteins += protein
             ID_and_uniprot[ID] = proteins
-
+            
         if ID_flag and (line.startswith("RE\t") or RE_flag):
             RE_flag = True
             line = line.replace("RE", "//")
@@ -59,8 +60,6 @@ with open(raw_data_file, 'r') as f:
                 reaction_list = list()
                 reaction = ""
 
-            
-#print(ID_and_reaction)
 
 IDs = []
 ECs = []
