@@ -732,6 +732,8 @@ for epoch in range(num_epochs):
 
     torch.save(model.state_dict(), os.path.join(results_dir, '13_mol_transformer'))
 
+plot_file = '13_losses.png'
+
 # performance evaluation
 def plot_losses(train_loss, test_loss,burn_in=20):
     plt.figure(figsize=(15, 4))
@@ -745,7 +747,7 @@ def plot_losses(train_loss, test_loss,burn_in=20):
     plt.legend(frameon=False)
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
-    plt.savefig(os.path.join(hyperparam_dir, plot_file))
+    plt.savefig(os.path.join(results_dir, plot_file))
     plt.close()
 
 
