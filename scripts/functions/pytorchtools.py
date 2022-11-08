@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from torch.nn.utils.rnn import pack_sequence
+from torch.nn.utils.rnn import pad_sequence
 
 # voxels to big
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -130,6 +130,16 @@ def collate_voxels(batch, add_noise=False, VOXEL_DATA=False):
 
     yy_pad = torch.stack(yy).type(torch.float).to(device)
     xx_pad = torch.stack(xx_pad).type(torch.float).to(device)
+
+    return xx_pad, yy_pad, x_lens, y_lens
+
+def pad_collate(batch, padding_value: int = 1):
+    (xx, yy) = zip(*batch)
+    x_lens = [len(x) for x in xx]
+    y_lens = [len(y) for y in yy]
+
+    xx_pad = pad_sequence(xx, batch_first=True, padding_value=padding_value)
+    yy_pad = pad_sequence(yy, batch_first=True, padding_value=padding_value)
 
     return xx_pad, yy_pad, x_lens, y_lens
 
