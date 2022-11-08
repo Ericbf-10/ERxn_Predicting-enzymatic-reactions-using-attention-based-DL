@@ -4,7 +4,8 @@ import re
 
 
 script_path = os.path.dirname(__file__)
-data_dir = os.path.join(script_path, '../data')
+data_dir = os.path.join(script_path, '..', 'data')
+
 raw_data_dir = os.path.join(data_dir, 'raw')
 raw_data_file = os.path.join(raw_data_dir, 'brenda_2022_2.txt')
 dest = os.path.join(data_dir, 'processed')
@@ -100,5 +101,5 @@ reaction_data = pd.DataFrame({
 uniprot_data = uniprot_data.drop_duplicates()
 reaction_data = reaction_data.drop_duplicates()
 
-uniprot_data.to_csv(f'{dest}/brenda_uniprotID_and_EC_raw.csv', index=None, sep=',')
-reaction_data.to_csv(f'{dest}brenda_reaction_and_EC_raw.csv', index=None, sep=',')
+uniprot_data.to_csv(f'{dest}/01a_brenda_uniprotID_and_EC_raw.csv', index=None, sep=',')
+reaction_data.to_csv(f'{dest}/01a_brenda_reaction_and_EC_raw.csv', index=None, sep=',')
