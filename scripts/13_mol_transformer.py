@@ -546,10 +546,11 @@ class Transformer(nn.Module):
     """
     def __init__(
             self,
-            vocab_size,
+            src_vocab_size,
+            tgt_vocab_size,
             embed_dim=512,
-            encoder_depth=8,
-            decoder_depth=8,
+            encoder_depth=6,
+            decoder_depth=6,
             n_heads=8,
             mlp_ratio=4.,
             qkv_bias=True,
@@ -561,7 +562,8 @@ class Transformer(nn.Module):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         super().__init__()
-        self.embedding = Embedding(vocab_size=vocab_size).to(self.device)
+        self.src_embedding = Embedding(vocab_size=src_vocab_size).to(self.device)
+        self.tgt_embedding = Embedding(vocab_size=tgt_vocab_size).to(self.device)
         self.pos_encoding = PositionalEncoding().to(self.device)
         self.pos_drop = nn.Dropout(p=p)
 
@@ -596,7 +598,7 @@ class Transformer(nn.Module):
         self.src_masking = src_masking
         self.tgt_masking = tgt_masking
 
-        self.head = nn.Linear(embed_dim, vocab_size)
+        self.head = nn.Linear(embed_dim, tgt_vocab_size)
         self.softmax = F.softmax
 
     def generate_mask(self, sz: int) -> Tensor:
@@ -625,14 +627,14 @@ class Transformer(nn.Module):
         else:
             tgt_mask = None
 
-        src_embed = self.embedding(src)
+        src_embed = self.src_embedding(src)
         src = self.pos_encoding(src_embed)
         src = self.pos_drop(src)
 
         for block in self.encoder_blocks:
             src, k, v = block(src, mask=src_mask)
 
-        tgt_embed = self.embedding(tgt)
+        tgt_embed = self.tgt_embedding(tgt)
         tgt = self.pos_encoding(tgt_embed)
         tgt = self.pos_drop(tgt)
 
@@ -667,10 +669,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 vocab_size = len(vocab)
 
 model = Transformer(
-    vocab_size,
+    src_vocab_size=vocab_size,
+    tgt_vocab_size=vocab_size,
     embed_dim=512,
-    encoder_depth=8,
-    decoder_depth=8,
+    encoder_depth=6,
+    decoder_depth=6,
     n_heads=8,
     mlp_ratio=4.,
     qkv_bias=True,
