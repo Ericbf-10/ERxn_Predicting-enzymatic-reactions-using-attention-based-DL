@@ -8,7 +8,7 @@ import warnings
 import numpy as np
 from torchtext.vocab import build_vocab_from_iterator
 import matplotlib.pyplot as plt
-from functions.pytorchtools import EarlyStopping, invoke, pad_collate, get_acc
+from functions.pytorchtools import EarlyStopping, invoke, pad_collate
 from functions.customDataset import RxnDataset
 from torch.utils.data import Dataset
 
@@ -544,7 +544,6 @@ class Transformer(nn.Module):
     p, attn_p : float
         Dropout probability.
     """
-
     def __init__(
             self,
             vocab_size,
@@ -646,6 +645,23 @@ class Transformer(nn.Module):
 
         return out
 
+
+def get_acc(out, tgt):
+    '''
+    calculate prediction accuracy
+    '''
+
+    out_cls = torch.argmax(out[-1], dim=1)
+    tgt_cls = torch.argmax(tgt[-1], dim=1)
+
+    matches = 0
+    for i in range(len(out_cls)):
+        if out_cls[i] == tgt_cls[i]:
+            matches += 1
+
+    return matches / len(out_cls)
+
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 vocab_size = len(vocab)
@@ -705,17 +721,17 @@ for epoch in range(num_epochs):
         loss = criterion(pred, one_hot_encoder(tgt, vocab_size).to(device))
         batch_loss += loss.data
 
-        #acc += get_acc(pred, tgt)
+        acc += get_acc(pred, tgt)
 
     test_loss.append(batch_loss / len(test_loader))
     acc = acc / len(test_loader)
 
     if epoch % (1) == 0:
         summary.append(
-            'Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f} %'.format(epoch, train_loss[-1],
-                                                                                          test_loss[-1]))
-        print('Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f} %'.format(epoch, train_loss[-1],
-                                                                                            test_loss[-1]))
+            'Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f}\tTest Acc: {:.6f} %'.format(epoch, train_loss[-1],
+                                                                                          test_loss[-1], acc))
+        print('Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f}\tTest Acc: {:.6f} %'.format(epoch, train_loss[-1],
+                                                                                            test_loss[-1], acc))
 
     if invoke(early_stopping, test_loss[-1], model, implement=True):
         model.load_state_dict(
