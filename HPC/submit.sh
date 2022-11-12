@@ -32,7 +32,8 @@ module load python3/3.7.11
 module load pandas/1.3.1-python-3.7.11
 module load numpy/1.21.1-python-3.7.11-openblas-0.3.17
 
-pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+#pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+pip3 install torch
 pip3 install torchtext
 pip3 install --upgrade pip
 pip3 install  networkx
