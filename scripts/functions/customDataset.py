@@ -43,5 +43,5 @@ class RxnDataset(Dataset):
             [vocab[token] for token in tgt.replace('\n', '').split(' ')]
         ).to(int)
         sos_token = torch.Tensor([sos_token]).to(int)
-        tgt = torch.concat((sos_token, tgt), dim=0).to(int)
+        tgt = torch.cat((sos_token, tgt), dim=0).to(int)
         return (src, tgt)
