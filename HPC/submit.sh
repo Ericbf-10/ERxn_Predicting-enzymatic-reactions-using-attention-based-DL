@@ -31,8 +31,9 @@ module load cuda/11.3
 module load python3/3.7.11
 module load pandas/1.3.1-python-3.7.11
 module load numpy/1.21.1-python-3.7.11-openblas-0.3.17
-pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
 
+pip3 install torchtext
+pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
 pip3 install --upgrade pip
 pip3 install  networkx
 pip3 install --user matplotlib
@@ -40,8 +41,7 @@ pip3 install tqdm
 pip3 install biopython
 pip3 install requests
 pip3 install -U scikit-learn
-pip3 install perceiver-pytorch
-pip3 install torchtext
+
 
 #python3 /zhome/4c/8/164840/projects/ERxn/scripts/12_hyper_param_optimization.py
 #python3 /zhome/4c/8/164840/projects/ERxn/scripts/10_protein_autoencoder.py
