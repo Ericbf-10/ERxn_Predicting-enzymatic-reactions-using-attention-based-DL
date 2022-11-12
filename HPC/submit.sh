@@ -28,14 +28,13 @@
 
 cd ~/projects/ERxn/scripts
 module load cuda/11.1
-module load python3/3.7.11
-module load pandas/1.3.1-python-3.7.11
-module load numpy/1.21.1-python-3.7.11-openblas-0.3.17
+module load python3/3.9.11
+module load pandas/1.4.1-python-3.7.11
+module load numpy/1.22.3-python-3.9.11-openblas-0.3.19
 
 #pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
 #pip3 install torchtext
 pip3 install torch==1.9.1+cu111 torchvision==0.10.1+cu111 torchaudio==0.9.1 -f https://download.pytorch.org/whl/torch_stable.html
-pip3 install torchtext==0.10.1
 pip3 install torchtext==0.10.1
 pip3 install --upgrade pip
 pip3 install  networkx
