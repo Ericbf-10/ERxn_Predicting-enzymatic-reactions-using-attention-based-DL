@@ -37,7 +37,7 @@ class RxnDataset(Dataset):
 
         src = torch.tensor(
             [vocab[token] for token in src.replace('\n', '').split(' ')]
-        )
+        ).to(int)
 
         tgt = torch.tensor(
             [vocab[token] for token in tgt.replace('\n', '').split(' ')]
