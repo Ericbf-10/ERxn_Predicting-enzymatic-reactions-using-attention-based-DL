@@ -82,19 +82,25 @@ train_loader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size=BATCH_SIZE,
     collate_fn=pad_collate,
-    shuffle=True)
+    shuffle=True,
+    pin_memory=False
+)
 
 test_loader = torch.utils.data.DataLoader(
     test_dataset,
     batch_size=BATCH_SIZE,
     collate_fn=pad_collate,
-    shuffle=True)
+    shuffle=True,
+    pin_memory=False
+)
 
 valid_loader = torch.utils.data.DataLoader(
     valid_dataset,
     batch_size=BATCH_SIZE,
     collate_fn=pad_collate,
-    shuffle=True)
+    shuffle=True,
+    pin_memory=False
+)
 
 
 def one_hot_encoder(v: Tensor, vocab_size: int) -> Tensor:
