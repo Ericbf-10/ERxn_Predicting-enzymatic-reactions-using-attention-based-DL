@@ -27,7 +27,7 @@
 >train.err
 
 cd ~/projects/ERxn/scripts
-module load cuda/11.3
+module load cuda/10.2
 module load python3/3.7.11
 module load pandas/1.3.1-python-3.7.11
 module load numpy/1.21.1-python-3.7.11-openblas-0.3.17
