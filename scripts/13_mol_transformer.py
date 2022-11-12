@@ -83,7 +83,7 @@ train_loader = torch.utils.data.DataLoader(
     batch_size=BATCH_SIZE,
     collate_fn=pad_collate,
     shuffle=True,
-    pin_memory=True
+    pin_memory=False
 )
 
 test_loader = torch.utils.data.DataLoader(
@@ -91,7 +91,7 @@ test_loader = torch.utils.data.DataLoader(
     batch_size=BATCH_SIZE,
     collate_fn=pad_collate,
     shuffle=True,
-    pin_memory=True
+    pin_memory=False
 )
 
 valid_loader = torch.utils.data.DataLoader(
@@ -99,7 +99,7 @@ valid_loader = torch.utils.data.DataLoader(
     batch_size=BATCH_SIZE,
     collate_fn=pad_collate,
     shuffle=True,
-    pin_memory=True
+    pin_memory=False
 )
 
 
