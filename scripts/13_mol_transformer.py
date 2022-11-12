@@ -710,8 +710,7 @@ for epoch in range(num_epochs):
 
         # forward + backward + optimize
         out = model(src, tgt)
-        tgt = one_hot_encoder(tgt, vocab_size).to(device)
-        loss = criterion(out, tgt)
+        loss = criterion(out, one_hot_encoder(tgt, vocab_size).to(device))
         loss.backward()
         optimizer.step()
         batch_loss += loss.data
@@ -727,8 +726,7 @@ for epoch in range(num_epochs):
         tgt = tgt.to(device)
 
         pred = model(src, tgt)
-        tgt = one_hot_encoder(tgt, vocab_size).to(device)
-        loss = criterion(pred, tgt)
+        loss = criterion(pred, one_hot_encoder(tgt, vocab_size).to(device))
         batch_loss += loss.data
 
         acc += get_acc(pred, tgt)
