@@ -76,14 +76,14 @@ valid_dataset = RxnDataset(src_valid_data_path,
                            vocab
                           )
 
-BATCH_SIZE =10
+BATCH_SIZE =100
 
 train_loader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size=BATCH_SIZE,
     collate_fn=pad_collate,
     shuffle=True,
-    pin_memory=False
+    pin_memory=True
 )
 
 test_loader = torch.utils.data.DataLoader(
@@ -91,7 +91,7 @@ test_loader = torch.utils.data.DataLoader(
     batch_size=BATCH_SIZE,
     collate_fn=pad_collate,
     shuffle=True,
-    pin_memory=False
+    pin_memory=True
 )
 
 valid_loader = torch.utils.data.DataLoader(
@@ -99,7 +99,7 @@ valid_loader = torch.utils.data.DataLoader(
     batch_size=BATCH_SIZE,
     collate_fn=pad_collate,
     shuffle=True,
-    pin_memory=False
+    pin_memory=True
 )
 
 
