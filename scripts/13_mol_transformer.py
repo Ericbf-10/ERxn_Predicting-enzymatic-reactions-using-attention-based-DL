@@ -691,7 +691,7 @@ model = Transformer(
 
 criterion = nn.CrossEntropyLoss()
 early_stopping = EarlyStopping(patience=10)
-optimizer = optimizer = torch.optim.Adam(model.parameters(),
+optimizer = torch.optim.Adam(model.parameters(),
                                          betas=(0.9, 0.998),
                                          lr=1e-3,
                                          weight_decay=0.01
