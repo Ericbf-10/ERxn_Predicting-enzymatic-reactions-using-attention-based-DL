@@ -76,7 +76,7 @@ valid_dataset = RxnDataset(src_valid_data_path,
                            vocab
                           )
 
-BATCH_SIZE =100
+BATCH_SIZE = 50
 
 train_loader = torch.utils.data.DataLoader(
     train_dataset,

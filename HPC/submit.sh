@@ -29,7 +29,7 @@
 cd ~/projects/ERxn/scripts
 module load cuda/11.6
 module load python3/3.10.7
-module load pandas/1.4.1-python-3.10.7
+module load pandas/1.4.4-python-3.10.7
 
 #pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
 #pip3 install torchtext
