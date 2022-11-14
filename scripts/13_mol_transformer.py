@@ -714,7 +714,6 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
         batch_loss += loss.data
-        break
 
     train_loss.append(batch_loss / len(train_loader))
 
@@ -731,7 +730,6 @@ for epoch in range(num_epochs):
         batch_loss += loss.data
 
         acc += get_acc(pred, one_hot_encoder(tgt, vocab_size).to(device))
-        break
 
     test_loss.append(batch_loss / len(test_loader))
     acc = acc / len(test_loader)
@@ -748,7 +746,6 @@ for epoch in range(num_epochs):
             torch.load(os.path.join(results_dir, '13_mol_transformer'),
                        map_location=device))
         summary.append(f'Early stopping after {epoch} epochs')
-        break
 
     torch.save(model.state_dict(), os.path.join(results_dir, '13_mol_transformer'))
 
@@ -757,7 +754,6 @@ for epoch in range(num_epochs):
             f.write(str(line) + '\n')
 
     torch.save(model.state_dict(), os.path.join(results_dir, '13_mol_transformer'))
-    break
 
 plot_file = '13_losses.png'
 
