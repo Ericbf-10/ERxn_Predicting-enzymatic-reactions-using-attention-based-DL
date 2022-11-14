@@ -242,7 +242,7 @@ def plot_losses(train_loss, test_loss,burn_in=20):
 
 
 train_loss = [x.detach().cpu().numpy() if not type(x) == float else np.array(x, dtype='f') for x in train_loss]
-test_loss = [x.detach().cpu().numpy() if not type(x) == float else np.array(x, dtype='f') for x in train_loss]
+test_loss = [x.detach().cpu().numpy() if not type(x) == float else np.array(x, dtype='f') for x in test_loss]
 plot_losses(train_loss, test_loss)
 
 with torch.no_grad():
