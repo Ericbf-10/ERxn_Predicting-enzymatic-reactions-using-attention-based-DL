@@ -714,6 +714,7 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
         batch_loss += loss.data
+        break
 
     train_loss.append(batch_loss / len(train_loader))
 
@@ -755,6 +756,7 @@ for epoch in range(num_epochs):
             f.write(str(line) + '\n')
 
     torch.save(model.state_dict(), os.path.join(results_dir, '13_mol_transformer'))
+    break
 
 plot_file = '13_losses.png'
 
