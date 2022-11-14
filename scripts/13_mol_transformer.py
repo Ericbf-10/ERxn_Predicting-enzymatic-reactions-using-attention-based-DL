@@ -730,7 +730,7 @@ for epoch in range(num_epochs):
         loss = criterion(pred, one_hot_encoder(tgt, vocab_size).to(device))
         batch_loss += loss.data
 
-        acc += get_acc(pred, tgt)
+        acc += get_acc(pred, one_hot_encoder(tgt, vocab_size).to(device))
 
     test_loss.append(batch_loss / len(test_loader))
     acc = acc / len(test_loader)
