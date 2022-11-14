@@ -731,6 +731,7 @@ for epoch in range(num_epochs):
         batch_loss += loss.data
 
         acc += get_acc(pred, one_hot_encoder(tgt, vocab_size).to(device))
+        break
 
     test_loss.append(batch_loss / len(test_loader))
     acc = acc / len(test_loader)
@@ -778,5 +779,5 @@ def plot_losses(train_loss, test_loss,burn_in=20):
 
 
 train_loss = [x.detach().cpu().numpy() if not type(x) == float else np.array(x, dtype='f') for x in train_loss]
-test_loss = [x.detach().cpu().numpy() if not type(x) == float else np.array(x, dtype='f') for x in train_loss]
+test_loss = [x.detach().cpu().numpy() if not type(x) == float else np.array(x, dtype='f') for x in test_loss]
 plot_losses(train_loss, test_loss)
