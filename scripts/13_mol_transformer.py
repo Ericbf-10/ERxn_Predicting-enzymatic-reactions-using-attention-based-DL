@@ -242,20 +242,21 @@ class SelfAttention(nn.Module):
         q, k, v : Tensor
             q, k, v shape [batch_size, n_heads, tgt_seq_length, head_dim]
         """
-        batch_size, n_tokens, dim = x.shape
+        seq_len, batch_size, dim = x.shape
 
         if dim != self.dim:
             raise ValueError
 
         qkv = self.qkv(x)  # (seq_length, batch_size, 3 * dim)
+        qkv = qkv.permute(1, 0, 2)  # (batch_size, seq_len, 3 * dim)
 
         qkv = qkv.reshape(
-            batch_size, n_tokens, 3, self.n_heads, self.head_dim
+            batch_size, seq_len, 3, self.n_heads, self.head_dim
         )  # (batch_size, seq_length + 1, 3, n_heads, head_dim)
 
         qkv = qkv.permute(
-            2, 1, 3, 0, 4
-        )  # (3, batch_size, n_heads, seq_length + 1, head_dim)
+            2, 0, 3, 1, 4
+        )  # (3, batch_size, n_heads, seq_length, head_dim)
 
         q, k, v = qkv[0], qkv[1], qkv[2]  # (batch_size, n_heads, seq_length, head_dim)
 
@@ -318,19 +319,20 @@ class EncoderDecoderAttention(nn.Module):
         q, k, v : Tensor
             q, k, v shape [batch_size, n_heads, tgt_seq_length, head_dim]
         """
-        batch_size, n_tokens, dim = x.shape
+        seq_len, batch_size, dim = x.shape
 
         if dim != self.dim:
             raise ValueError
 
         q = self.q_matrix(x)  # (tgt_seq_length, batch_size, dim)
+        q = q.permute(1, 0, 2)
 
         q = q.reshape(
-            batch_size, n_tokens, self.n_heads, self.head_dim
-        )  # (tgt_seq_length, batch_size, n_heads, head_dim)
+            batch_size, seq_len, self.n_heads, self.head_dim
+        )  # (batch_size, tgt_seq_len, n_heads, head_dim)
 
         q = q.permute(
-            1, 2, 0, 3
+            0, 2, 1, 3
         )  # (batch_size, n_heads, tgt_seq_length, head_dim)
 
         dp = torch.einsum('abkd,abqd->abqk', k,
@@ -695,7 +697,8 @@ optimizer = torch.optim.Adam(model.parameters(),
                                          betas=(0.9, 0.998),
                                          lr=1e-3,
                                          weight_decay=0.01
-                                         )
+                             )
+
 num_epochs = 1000
 train_loss, test_loss = [], []
 summary = []
