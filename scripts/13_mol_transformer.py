@@ -162,42 +162,24 @@ class Embedding(nn.Module):
 
 
 class PositionalEncoding(nn.Module):
-    '''
-    positional encoding
-    Args:
-    -----
-        embed_dim: int
-            embedding dimension
-        dropout : float
-            dropout probability
-        max_len : int
-            maximum sequence length
-    '''
+    "Implement the PE function."
 
     def __init__(self, embed_dim: int = 512, dropout: float = 0.1, max_len: int = 5000):
-        super().__init__()
+        super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(p=dropout)
 
-        position = torch.arange(max_len).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, embed_dim, 2) * (-math.log(10000.0) / embed_dim))
-        pe = torch.zeros(max_len, 1, embed_dim)
-        pe[:, 0, 0::2] = torch.sin(position * div_term)
-        pe[:, 0, 1::2] = torch.cos(position * div_term)
+        # Compute the positional encodings once in log space.
+        pe = torch.zeros(max_len, embed_dim)
+        position = torch.arange(0, max_len).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, embed_dim, 2) * -(math.log(10000.0) / embed_dim))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(0)
         self.register_buffer('pe', pe)
 
-    def forward(self, x: Tensor) -> Tensor:
-        """
-        Args:
-        -----
-        x: Tensor
-            shape [seq_len, batch_size, embedding_dim]
-        Returns:
-        --------
-        out : Tensor
-            shape [seq_len, batch_size, embedding_dim]
-        """
-        out = x + self.pe[:x.size(0)]
-        return self.dropout(out)
+    def forward(self, x):
+        x = x + self.pe[:, :x.size(1)]
+        return self.dropout(x)
 
 
 class SelfAttention(nn.Module):
@@ -260,15 +242,15 @@ class SelfAttention(nn.Module):
 
         q, k, v = qkv[0], qkv[1], qkv[2]  # (batch_size, n_heads, seq_length, head_dim)
 
-        dp = torch.einsum('kabc,qdef->qabe', k, q) * self.scale  # k_t @ q (batch_size, n_heads, seq_length, seq_length)
+        dp = torch.einsum('ijkl,ijml->ijkm', q, k) * self.scale  # k_t @ q (batch_size, n_heads, seq_length, seq_length)
 
         if mask is not None:
-            torch.einsum('xy,abcd->abxy', mask, dp)
+            dp = dp.masked_fill(mask == float('-inf'), float('-inf'))
 
         scores = dp.softmax(dim=-1)  # (batch_size, n_heads, seq_length, seq_length)
         scores = self.attn_drop(scores)
 
-        weighted_avg = torch.einsum('qabc,kdef->bqaf', scores, v)  # (batch_size, seq_length, n_heads, head_dim)
+        weighted_avg = torch.einsum('ijkl,ijlm->kijm', scores, v)  # (seq_len, batch_size, n_heads, head_dim)
         weighted_avg = weighted_avg.flatten(2)  # (seq_length, batch_size, dim)
 
         x = self.proj(weighted_avg)  # (seq_length, batch_size, dim)
@@ -325,7 +307,7 @@ class EncoderDecoderAttention(nn.Module):
             raise ValueError
 
         q = self.q_matrix(x)  # (tgt_seq_length, batch_size, dim)
-        q = q.permute(1, 0, 2)
+        q = q.permute(1, 0, 2)  # (batch_size, tgt_seq_length, dim)
 
         q = q.reshape(
             batch_size, seq_len, self.n_heads, self.head_dim
@@ -335,16 +317,17 @@ class EncoderDecoderAttention(nn.Module):
             0, 2, 1, 3
         )  # (batch_size, n_heads, tgt_seq_length, head_dim)
 
-        dp = torch.einsum('abkd,abqd->abqk', k,
-                          q) * self.scale  # k_t @ q (batch_size, n_heads, tgt_seq_len, src_seq_len)
+        dp = torch.einsum('ijml,ijkl->ijmk', q,
+                          k) * self.scale  # k_t @ q (batch_size, n_heads, tgt_seq_len, src_seq_len)
 
         if mask is not None:
-            torch.einsum('xy,abcd->abxy', mask, dp)
+            dp = dp.masked_fill(mask == float('-inf'), float('-inf'))
 
         scores = dp.softmax(dim=-1)  # (batch_size, n_heads, seq_length + 1, seq_length + 1)
         scores = self.attn_drop(scores)
 
-        weighted_avg = torch.einsum('abts,abse->tabe', scores, v)  # (seq_length, batch_size, n_heads, head_dim)
+        weighted_avg = torch.einsum('ijkl,ijlm->kijm', scores, v)  # (seq_length, batch_size, n_heads, head_dim)
+
         weighted_avg = weighted_avg.flatten(2)  # (seq_length, batch_size, dim)
 
         x = self.proj(weighted_avg)  # (seq_length, batch_size, dim)
@@ -511,7 +494,8 @@ class DecoderBlock(nn.Module):
         )
         self.norm3 = nn.LayerNorm(dim, eps=1e-6)
 
-    def forward(self, x: Tensor, k: Tensor, v: Tensor, mask: Tensor = None) -> Tensor:
+    def forward(self, x: Tensor, k: Tensor, v: Tensor,
+                mask_self_attn: Tensor = None, mask_cross_attn: Tensor = None) -> Tensor:
         """Run forward pass.
         Parameters
         ----------
@@ -522,10 +506,10 @@ class DecoderBlock(nn.Module):
         torch.Tensor
             Shape `(batch_size, n_patches + 1, dim)`.
         """
-        attn, _, _, _ = self.self_attn(x, mask)
+        attn, _, _, _ = self.self_attn(x, mask_self_attn)
 
         attn_add_norm = self.norm1(attn + x)
-        attn, _, _, _ = self.encoder_decoder_attn(attn_add_norm, k, v, mask)
+        attn, _, _, _ = self.encoder_decoder_attn(attn_add_norm, k, v, mask_cross_attn)
         attn_add_norm = self.norm2(attn + x)
         z = self.mlp(attn_add_norm)
         out = self.norm3(z + attn_add_norm)
@@ -552,13 +536,14 @@ class Transformer(nn.Module):
     p, attn_p : float
         Dropout probability.
     """
+
     def __init__(
             self,
             src_vocab_size,
             tgt_vocab_size,
             embed_dim=512,
-            encoder_depth=6,
-            decoder_depth=6,
+            encoder_depth=8,
+            decoder_depth=8,
             n_heads=8,
             mlp_ratio=4.,
             qkv_bias=True,
@@ -567,12 +552,10 @@ class Transformer(nn.Module):
             src_masking=False,
             tgt_masking=True
     ):
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
         super().__init__()
-        self.src_embedding = Embedding(vocab_size=src_vocab_size).to(self.device)
-        self.tgt_embedding = Embedding(vocab_size=tgt_vocab_size).to(self.device)
-        self.pos_encoding = PositionalEncoding().to(self.device)
+        self.src_embedding = Embedding(vocab_size=src_vocab_size)
+        self.tgt_embedding = Embedding(vocab_size=tgt_vocab_size)
+        self.pos_encoding = PositionalEncoding()
         self.pos_drop = nn.Dropout(p=p)
 
         self.encoder_blocks = nn.ModuleList(
@@ -584,10 +567,10 @@ class Transformer(nn.Module):
                     qkv_bias=qkv_bias,
                     p=p,
                     attn_p=attn_p,
-                ).to(self.device)
+                )
                 for _ in range(encoder_depth)
             ]
-        ).to(device)
+        )
 
         self.decoder_blocks = nn.ModuleList(
             [
@@ -598,10 +581,10 @@ class Transformer(nn.Module):
                     qkv_bias=qkv_bias,
                     p=p,
                     attn_p=attn_p,
-                ).to(self.device)
+                )
                 for _ in range(decoder_depth)
             ]
-        ).to(device)
+        )
 
         self.src_masking = src_masking
         self.tgt_masking = tgt_masking
@@ -609,9 +592,9 @@ class Transformer(nn.Module):
         self.head = nn.Linear(embed_dim, tgt_vocab_size)
         self.softmax = F.softmax
 
-    def generate_mask(self, sz: int) -> Tensor:
+    def generate_mask(self, s1: int, s2: int) -> Tensor:
         """Generates an upper-triangular matrix of -inf, with zeros on diag."""
-        return torch.triu(torch.ones(sz, sz) * float('-inf'), diagonal=1).to(self.device)
+        return torch.triu(torch.ones(s1, s2) * float('-inf'), diagonal=1)
 
     def forward(self, src, tgt):
         """Run the forward pass.
@@ -624,16 +607,18 @@ class Transformer(nn.Module):
         logits : torch.Tensor
             Logits over all the classes - `(batch_size, n_classes)`.
         """
-
         if self.src_masking:
-            src_mask = self.generate_mask(src.size(1))
+            src_mask = self.generate_mask(src.size(1), src.size(1))
         else:
             src_mask = None
 
         if self.tgt_masking:
-            tgt_mask = self.generate_mask(tgt.size(1))
+            tgt_mask_self_attn = self.generate_mask(tgt.size(1), tgt.size(1))
+            tgt_mask_cross_attn = self.generate_mask(tgt.size(1), src.size(1))
+
         else:
-            tgt_mask = None
+            tgt_mask_self_attn = None
+            tgt_mask_cross_attn = None
 
         src_embed = self.src_embedding(src)
         src = self.pos_encoding(src_embed)
@@ -647,7 +632,9 @@ class Transformer(nn.Module):
         tgt = self.pos_drop(tgt)
 
         for block in self.decoder_blocks:
-            tgt = block(tgt, k, v, mask=tgt_mask)
+            tgt = block(tgt, k, v,
+                        mask_self_attn=tgt_mask_self_attn,
+                        mask_cross_attn=tgt_mask_cross_attn)
 
         out = self.head(tgt)
         out = self.softmax(out, dim=-1)
