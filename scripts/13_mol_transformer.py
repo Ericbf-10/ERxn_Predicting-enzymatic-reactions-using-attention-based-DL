@@ -591,6 +591,7 @@ class Transformer(nn.Module):
 
         self.head = nn.Linear(embed_dim, tgt_vocab_size)
         self.softmax = F.softmax
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     def generate_mask(self, s1: int, s2: int) -> Tensor:
         """Generates an upper-triangular matrix of -inf, with zeros on diag."""
@@ -608,13 +609,13 @@ class Transformer(nn.Module):
             Logits over all the classes - `(batch_size, n_classes)`.
         """
         if self.src_masking:
-            src_mask = self.generate_mask(src.size(1), src.size(1))
+            src_mask = self.generate_mask(src.size(1), src.size(1)).to(self.device)
         else:
             src_mask = None
 
         if self.tgt_masking:
-            tgt_mask_self_attn = self.generate_mask(tgt.size(1), tgt.size(1))
-            tgt_mask_cross_attn = self.generate_mask(tgt.size(1), src.size(1))
+            tgt_mask_self_attn = self.generate_mask(tgt.size(1), tgt.size(1)).to(self.device)
+            tgt_mask_cross_attn = self.generate_mask(tgt.size(1), src.size(1)).to(self.device)
 
         else:
             tgt_mask_self_attn = None
