@@ -553,8 +553,10 @@ class Transformer(nn.Module):
             tgt_masking=True
     ):
         super().__init__()
-        self.src_embedding = Embedding(vocab_size=src_vocab_size)
-        self.tgt_embedding = Embedding(vocab_size=tgt_vocab_size)
+        self.src_embedding = Embedding(vocab_size=src_vocab_size,
+                                       embed_dim=embed_dim)
+        self.tgt_embedding = Embedding(vocab_size=tgt_vocab_size,
+                                       embed_dim=embed_dim)
         self.pos_encoding = PositionalEncoding()
         self.pos_drop = nn.Dropout(p=p)
 
