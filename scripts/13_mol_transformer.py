@@ -557,7 +557,8 @@ class Transformer(nn.Module):
                                        embed_dim=embed_dim)
         self.tgt_embedding = Embedding(vocab_size=tgt_vocab_size,
                                        embed_dim=embed_dim)
-        self.pos_encoding = PositionalEncoding()
+        self.pos_encoding = PositionalEncoding(embed_dim=embed_dim,
+                                               dropout=p)
         self.pos_drop = nn.Dropout(p=p)
 
         self.encoder_blocks = nn.ModuleList(
@@ -707,6 +708,7 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
         batch_loss += loss.data
+        print(out)
 
     train_loss.append(batch_loss / len(train_loader))
 
