@@ -76,7 +76,7 @@ valid_dataset = RxnDataset(src_valid_data_path,
                            vocab
                           )
 
-BATCH_SIZE = 50
+BATCH_SIZE = 4096
 
 train_loader = torch.utils.data.DataLoader(
     train_dataset,
@@ -667,7 +667,7 @@ vocab_size = len(vocab)
 model = Transformer(
     src_vocab_size=vocab_size,
     tgt_vocab_size=vocab_size,
-    embed_dim=512,
+    embed_dim=256,
     encoder_depth=6,
     decoder_depth=6,
     n_heads=8,
