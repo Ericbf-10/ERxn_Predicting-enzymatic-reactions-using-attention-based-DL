@@ -22,7 +22,7 @@ parser.add_argument("-epoch", action="store", dest="NUM_EPOCHS", type=int, defau
 parser.add_argument("-pati", action="store", dest="PATIENCE", type=int, default=10, help="Patience (default: 10)")
 parser.add_argument("-bs", action="store", dest="BATCH_SIZE", type=int, default=100, help="Batch Size (default: 100)")
 parser.add_argument("-m", action="store", dest="MOMENTUM", type=float, default=0.9, help="Momentum (default: 0.9)")
-parser.add_argument("-pin", action="store_false", dest="PIN_MEMORY", help="Pin Memory (default: False)")
+parser.add_argument("-pin", action="store_false", dest="PIN_MEMORY", default=False, help="Pin Memory (default: False)")
 parser.add_argument("-plen", action="store", dest="PATCH_LENGTH", type=int, default=400, help="Patch Length (default: 400)")
 parser.add_argument("-embed", action="store", dest="EMBED_DIM", type=int, default=768, help="Embedding Dimension (default: 768)")
 parser.add_argument("-depth", action="store", dest="DEPTH", type=int, default=12, help="Number of Blocks (default: 12)")
