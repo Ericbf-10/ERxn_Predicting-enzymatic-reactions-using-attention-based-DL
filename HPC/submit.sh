@@ -48,4 +48,4 @@ pip install -U scikit-learn
 #python3 /zhome/4c/8/164840/projects/ERxn/scripts/10_protein_autoencoder.py
 
 #python3 /zhome/4c/8/164840/projects/ERxn/scripts/13_mol_transformer.py
-python3 /zhome/4c/8/164840/projects/ERxn/scripts/11_protein_encoder.py
+python3 /zhome/4c/8/164840/projects/ERxn/scripts/11_protein_encoder.py -optim sgd
