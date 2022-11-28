@@ -140,7 +140,7 @@ model = ProteinEncoder(
     attn_p=ATTN_P
 ).to(device)
 
-model.load_state_dict(torch.load(os.path.join(results_dir, '10_protein_autoencoder')))
+#model.load_state_dict(torch.load(os.path.join(results_dir, '10_protein_autoencoder')))
 
 ## Training loop
 # Loss
