@@ -28,7 +28,7 @@ parser.add_argument("-embed", action="store", dest="EMBED_DIM", type=int, defaul
 parser.add_argument("-depth", action="store", dest="DEPTH", type=int, default=12, help="Number of Blocks (default: 12)")
 parser.add_argument("-heads", action="store", dest="N_HEADS", type=int, default=8, help="Number of attention heads (default: 12)")
 parser.add_argument("-mlp", action="store", dest="MLP_RATIO", type=float, default=4.0, help="Hidden dimension of the MLP module (default: 4.0)")
-parser.add_argument("-qkvbias", action="store_true", dest="QKV_BIAS", type=bool, default=False, help="Include bias to Q, K and V projections (default: False)")
+parser.add_argument("-qkvbias", action="store_true", dest="QKV_BIAS", default=False, help="Include bias to Q, K and V projections (default: False)")
 parser.add_argument("-p", action="store", dest="P_DROP", type=float, default=0.1, help="Dropout probability (default: 0.1)")
 parser.add_argument("-attnp", action="store", dest="ATTN_P", type=float, default=0.1, help="Dropout probability (default: 0.1)")
 parser.add_argument("-fout", action="store", dest="out_file", default="out", type=str, help="Output summary file")
