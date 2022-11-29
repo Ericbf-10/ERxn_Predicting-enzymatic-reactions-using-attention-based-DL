@@ -89,6 +89,10 @@ for EC in ID_and_reaction:
         pass
     else:
         for r in reaction:
+            r = r.split("(#")
+            r = r.pop(0)
+            r = ''.join(r)
+            r = r[1:-1]
             IDs.append(EC)
             reactions.append(r)
 
@@ -97,9 +101,8 @@ reaction_data = pd.DataFrame({
     'reaction': reactions
 })
 
-
 uniprot_data = uniprot_data.drop_duplicates()
 reaction_data = reaction_data.drop_duplicates()
 
 uniprot_data.to_csv(f'{dest}/01a_brenda_uniprotID_and_EC_raw.csv', index=None, sep=',')
-reaction_data.to_csv(f'{dest}/01a_brenda_reaction_and_EC_raw.csv', index=None, sep=',')
+reaction_data.to_csv(f'{dest}/01b_brenda_reaction_and_EC_raw.csv', index=None, sep=',')
