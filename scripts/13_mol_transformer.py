@@ -8,7 +8,7 @@ import warnings
 import numpy as np
 from torchtext.vocab import build_vocab_from_iterator
 import matplotlib.pyplot as plt
-from functions.pytorchtools import EarlyStopping, invoke, pad_collate, get_acc
+from functions.pytorchtools import EarlyStopping, invoke, pad_collate
 from functions.customDataset import RxnDataset
 from torch.utils.data import Dataset
 
@@ -76,25 +76,31 @@ valid_dataset = RxnDataset(src_valid_data_path,
                            vocab
                           )
 
-BATCH_SIZE =10
+BATCH_SIZE = 64
 
 train_loader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size=BATCH_SIZE,
     collate_fn=pad_collate,
-    shuffle=True)
+    shuffle=True,
+    pin_memory=False
+)
 
 test_loader = torch.utils.data.DataLoader(
     test_dataset,
     batch_size=BATCH_SIZE,
     collate_fn=pad_collate,
-    shuffle=True)
+    shuffle=True,
+    pin_memory=False
+)
 
 valid_loader = torch.utils.data.DataLoader(
     valid_dataset,
     batch_size=BATCH_SIZE,
     collate_fn=pad_collate,
-    shuffle=True)
+    shuffle=True,
+    pin_memory=False
+)
 
 
 def one_hot_encoder(v: Tensor, vocab_size: int) -> Tensor:
@@ -156,42 +162,24 @@ class Embedding(nn.Module):
 
 
 class PositionalEncoding(nn.Module):
-    '''
-    positional encoding
-    Args:
-    -----
-        embed_dim: int
-            embedding dimension
-        dropout : float
-            dropout probability
-        max_len : int
-            maximum sequence length
-    '''
+    "Implement the PE function."
 
     def __init__(self, embed_dim: int = 512, dropout: float = 0.1, max_len: int = 5000):
-        super().__init__()
+        super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(p=dropout)
 
-        position = torch.arange(max_len).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, embed_dim, 2) * (-math.log(10000.0) / embed_dim))
-        pe = torch.zeros(max_len, 1, embed_dim)
-        pe[:, 0, 0::2] = torch.sin(position * div_term)
-        pe[:, 0, 1::2] = torch.cos(position * div_term)
+        # Compute the positional encodings once in log space.
+        pe = torch.zeros(max_len, embed_dim)
+        position = torch.arange(0, max_len).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, embed_dim, 2) * -(math.log(10000.0) / embed_dim))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(0)
         self.register_buffer('pe', pe)
 
-    def forward(self, x: Tensor) -> Tensor:
-        """
-        Args:
-        -----
-        x: Tensor
-            shape [seq_len, batch_size, embedding_dim]
-        Returns:
-        --------
-        out : Tensor
-            shape [seq_len, batch_size, embedding_dim]
-        """
-        out = x + self.pe[:x.size(0)]
-        return self.dropout(out)
+    def forward(self, x):
+        x = x + self.pe[:, :x.size(1)]
+        return self.dropout(x)
 
 
 class SelfAttention(nn.Module):
@@ -236,32 +224,33 @@ class SelfAttention(nn.Module):
         q, k, v : Tensor
             q, k, v shape [batch_size, n_heads, tgt_seq_length, head_dim]
         """
-        batch_size, n_tokens, dim = x.shape
+        seq_len, batch_size, dim = x.shape
 
         if dim != self.dim:
             raise ValueError
 
         qkv = self.qkv(x)  # (seq_length, batch_size, 3 * dim)
+        qkv = qkv.permute(1, 0, 2)  # (batch_size, seq_len, 3 * dim)
 
         qkv = qkv.reshape(
-            batch_size, n_tokens, 3, self.n_heads, self.head_dim
+            batch_size, seq_len, 3, self.n_heads, self.head_dim
         )  # (batch_size, seq_length + 1, 3, n_heads, head_dim)
 
         qkv = qkv.permute(
-            2, 1, 3, 0, 4
-        )  # (3, batch_size, n_heads, seq_length + 1, head_dim)
+            2, 0, 3, 1, 4
+        )  # (3, batch_size, n_heads, seq_length, head_dim)
 
         q, k, v = qkv[0], qkv[1], qkv[2]  # (batch_size, n_heads, seq_length, head_dim)
 
-        dp = torch.einsum('kabc,qdef->qabe', k, q) * self.scale  # k_t @ q (batch_size, n_heads, seq_length, seq_length)
+        dp = torch.einsum('ijkl,ijml->ijkm', q, k) * self.scale  # k_t @ q (batch_size, n_heads, seq_length, seq_length)
 
         if mask is not None:
-            torch.einsum('xy,abcd->abxy', mask, dp)
+            dp = dp.masked_fill(mask == float('-inf'), float('-inf'))
 
         scores = dp.softmax(dim=-1)  # (batch_size, n_heads, seq_length, seq_length)
         scores = self.attn_drop(scores)
 
-        weighted_avg = torch.einsum('qabc,kdef->bqaf', scores, v)  # (batch_size, seq_length, n_heads, head_dim)
+        weighted_avg = torch.einsum('ijkl,ijlm->kijm', scores, v)  # (seq_len, batch_size, n_heads, head_dim)
         weighted_avg = weighted_avg.flatten(2)  # (seq_length, batch_size, dim)
 
         x = self.proj(weighted_avg)  # (seq_length, batch_size, dim)
@@ -312,31 +301,33 @@ class EncoderDecoderAttention(nn.Module):
         q, k, v : Tensor
             q, k, v shape [batch_size, n_heads, tgt_seq_length, head_dim]
         """
-        batch_size, n_tokens, dim = x.shape
+        seq_len, batch_size, dim = x.shape
 
         if dim != self.dim:
             raise ValueError
 
         q = self.q_matrix(x)  # (tgt_seq_length, batch_size, dim)
+        q = q.permute(1, 0, 2)  # (batch_size, tgt_seq_length, dim)
 
         q = q.reshape(
-            batch_size, n_tokens, self.n_heads, self.head_dim
-        )  # (tgt_seq_length, batch_size, n_heads, head_dim)
+            batch_size, seq_len, self.n_heads, self.head_dim
+        )  # (batch_size, tgt_seq_len, n_heads, head_dim)
 
         q = q.permute(
-            1, 2, 0, 3
+            0, 2, 1, 3
         )  # (batch_size, n_heads, tgt_seq_length, head_dim)
 
-        dp = torch.einsum('abkd,abqd->abqk', k,
-                          q) * self.scale  # k_t @ q (batch_size, n_heads, tgt_seq_len, src_seq_len)
+        dp = torch.einsum('ijml,ijkl->ijmk', q,
+                          k) * self.scale  # k_t @ q (batch_size, n_heads, tgt_seq_len, src_seq_len)
 
         if mask is not None:
-            torch.einsum('xy,abcd->abxy', mask, dp)
+            dp = dp.masked_fill(mask == float('-inf'), float('-inf'))
 
         scores = dp.softmax(dim=-1)  # (batch_size, n_heads, seq_length + 1, seq_length + 1)
         scores = self.attn_drop(scores)
 
-        weighted_avg = torch.einsum('abts,abse->tabe', scores, v)  # (seq_length, batch_size, n_heads, head_dim)
+        weighted_avg = torch.einsum('ijkl,ijlm->kijm', scores, v)  # (seq_length, batch_size, n_heads, head_dim)
+
         weighted_avg = weighted_avg.flatten(2)  # (seq_length, batch_size, dim)
 
         x = self.proj(weighted_avg)  # (seq_length, batch_size, dim)
@@ -503,7 +494,8 @@ class DecoderBlock(nn.Module):
         )
         self.norm3 = nn.LayerNorm(dim, eps=1e-6)
 
-    def forward(self, x: Tensor, k: Tensor, v: Tensor, mask: Tensor = None) -> Tensor:
+    def forward(self, x: Tensor, k: Tensor, v: Tensor,
+                mask_self_attn: Tensor = None, mask_cross_attn: Tensor = None) -> Tensor:
         """Run forward pass.
         Parameters
         ----------
@@ -514,10 +506,10 @@ class DecoderBlock(nn.Module):
         torch.Tensor
             Shape `(batch_size, n_patches + 1, dim)`.
         """
-        attn, _, _, _ = self.self_attn(x, mask)
+        attn, _, _, _ = self.self_attn(x, mask_self_attn)
 
         attn_add_norm = self.norm1(attn + x)
-        attn, _, _, _ = self.encoder_decoder_attn(attn_add_norm, k, v, mask)
+        attn, _, _, _ = self.encoder_decoder_attn(attn_add_norm, k, v, mask_cross_attn)
         attn_add_norm = self.norm2(attn + x)
         z = self.mlp(attn_add_norm)
         out = self.norm3(z + attn_add_norm)
@@ -547,7 +539,8 @@ class Transformer(nn.Module):
 
     def __init__(
             self,
-            vocab_size,
+            src_vocab_size,
+            tgt_vocab_size,
             embed_dim=512,
             encoder_depth=8,
             decoder_depth=8,
@@ -559,11 +552,13 @@ class Transformer(nn.Module):
             src_masking=False,
             tgt_masking=True
     ):
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
         super().__init__()
-        self.embedding = Embedding(vocab_size=vocab_size).to(self.device)
-        self.pos_encoding = PositionalEncoding().to(self.device)
+        self.src_embedding = Embedding(vocab_size=src_vocab_size,
+                                       embed_dim=embed_dim)
+        self.tgt_embedding = Embedding(vocab_size=tgt_vocab_size,
+                                       embed_dim=embed_dim)
+        self.pos_encoding = PositionalEncoding(embed_dim=embed_dim,
+                                               dropout=p)
         self.pos_drop = nn.Dropout(p=p)
 
         self.encoder_blocks = nn.ModuleList(
@@ -575,10 +570,10 @@ class Transformer(nn.Module):
                     qkv_bias=qkv_bias,
                     p=p,
                     attn_p=attn_p,
-                ).to(self.device)
+                )
                 for _ in range(encoder_depth)
             ]
-        ).to(device)
+        )
 
         self.decoder_blocks = nn.ModuleList(
             [
@@ -589,20 +584,21 @@ class Transformer(nn.Module):
                     qkv_bias=qkv_bias,
                     p=p,
                     attn_p=attn_p,
-                ).to(self.device)
+                )
                 for _ in range(decoder_depth)
             ]
-        ).to(device)
+        )
 
         self.src_masking = src_masking
         self.tgt_masking = tgt_masking
 
-        self.head = nn.Linear(embed_dim, vocab_size)
+        self.head = nn.Linear(embed_dim, tgt_vocab_size)
         self.softmax = F.softmax
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    def generate_mask(self, sz: int) -> Tensor:
+    def generate_mask(self, s1: int, s2: int) -> Tensor:
         """Generates an upper-triangular matrix of -inf, with zeros on diag."""
-        return torch.triu(torch.ones(sz, sz) * float('-inf'), diagonal=1).to(self.device)
+        return torch.triu(torch.ones(s1, s2) * float('-inf'), diagonal=1)
 
     def forward(self, src, tgt):
         """Run the forward pass.
@@ -615,30 +611,34 @@ class Transformer(nn.Module):
         logits : torch.Tensor
             Logits over all the classes - `(batch_size, n_classes)`.
         """
-
         if self.src_masking:
-            src_mask = self.generate_mask(src.size(1))
+            src_mask = self.generate_mask(src.size(1), src.size(1)).to(self.device)
         else:
             src_mask = None
 
         if self.tgt_masking:
-            tgt_mask = self.generate_mask(tgt.size(1))
-        else:
-            tgt_mask = None
+            tgt_mask_self_attn = self.generate_mask(tgt.size(1), tgt.size(1)).to(self.device)
+            tgt_mask_cross_attn = self.generate_mask(tgt.size(1), src.size(1)).to(self.device)
 
-        src_embed = self.embedding(src)
+        else:
+            tgt_mask_self_attn = None
+            tgt_mask_cross_attn = None
+
+        src_embed = self.src_embedding(src)
         src = self.pos_encoding(src_embed)
         src = self.pos_drop(src)
 
         for block in self.encoder_blocks:
             src, k, v = block(src, mask=src_mask)
 
-        tgt_embed = self.embedding(tgt)
+        tgt_embed = self.tgt_embedding(tgt)
         tgt = self.pos_encoding(tgt_embed)
         tgt = self.pos_drop(tgt)
 
         for block in self.decoder_blocks:
-            tgt = block(tgt, k, v, mask=tgt_mask)
+            tgt = block(tgt, k, v,
+                        mask_self_attn=tgt_mask_self_attn,
+                        mask_cross_attn=tgt_mask_cross_attn)
 
         out = self.head(tgt)
         out = self.softmax(out, dim=-1)
@@ -646,15 +646,33 @@ class Transformer(nn.Module):
 
         return out
 
+
+def get_acc(out, tgt):
+    '''
+    calculate prediction accuracy
+    '''
+
+    out_cls = torch.argmax(out[-1], dim=1)
+    tgt_cls = torch.argmax(tgt[-1], dim=1)
+
+    matches = 0
+    for i in range(len(out_cls)):
+        if out_cls[i] == tgt_cls[i]:
+            matches += 1
+
+    return matches / len(out_cls)
+
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 vocab_size = len(vocab)
 
 model = Transformer(
-    vocab_size,
-    embed_dim=512,
-    encoder_depth=8,
-    decoder_depth=8,
+    src_vocab_size=vocab_size,
+    tgt_vocab_size=vocab_size,
+    embed_dim=256,
+    encoder_depth=6,
+    decoder_depth=6,
     n_heads=8,
     mlp_ratio=4.,
     qkv_bias=True,
@@ -666,11 +684,12 @@ model = Transformer(
 
 criterion = nn.CrossEntropyLoss()
 early_stopping = EarlyStopping(patience=10)
-optimizer = optimizer = torch.optim.Adam(model.parameters(),
+optimizer = torch.optim.Adam(model.parameters(),
                                          betas=(0.9, 0.998),
                                          lr=1e-3,
                                          weight_decay=0.01
-                                         )
+                             )
+
 num_epochs = 1000
 train_loss, test_loss = [], []
 summary = []
@@ -685,11 +704,11 @@ for epoch in range(num_epochs):
 
         # forward + backward + optimize
         out = model(src, tgt)
-
         loss = criterion(out, one_hot_encoder(tgt, vocab_size).to(device))
         loss.backward()
         optimizer.step()
         batch_loss += loss.data
+        print(out)
 
     train_loss.append(batch_loss / len(train_loader))
 
@@ -705,24 +724,23 @@ for epoch in range(num_epochs):
         loss = criterion(pred, one_hot_encoder(tgt, vocab_size).to(device))
         batch_loss += loss.data
 
-        #acc += get_acc(pred, tgt)
+        acc += get_acc(pred, one_hot_encoder(tgt, vocab_size).to(device))
 
     test_loss.append(batch_loss / len(test_loader))
     acc = acc / len(test_loader)
 
     if epoch % (1) == 0:
         summary.append(
-            'Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f} %'.format(epoch, train_loss[-1],
-                                                                                          test_loss[-1]))
-        print('Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f} %'.format(epoch, train_loss[-1],
-                                                                                            test_loss[-1]))
+            'Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f}\tTest Acc: {:.6f} %'.format(epoch, train_loss[-1],
+                                                                                          test_loss[-1], acc))
+        print('Train Epoch: {}\tLoss: {:.6f}\tTest Loss: {:.6f}\tTest Acc: {:.6f} %'.format(epoch, train_loss[-1],
+                                                                                            test_loss[-1], acc))
 
     if invoke(early_stopping, test_loss[-1], model, implement=True):
         model.load_state_dict(
             torch.load(os.path.join(results_dir, '13_mol_transformer'),
                        map_location=device))
         summary.append(f'Early stopping after {epoch} epochs')
-        break
 
     torch.save(model.state_dict(), os.path.join(results_dir, '13_mol_transformer'))
 
@@ -731,6 +749,8 @@ for epoch in range(num_epochs):
             f.write(str(line) + '\n')
 
     torch.save(model.state_dict(), os.path.join(results_dir, '13_mol_transformer'))
+
+plot_file = '13_losses.png'
 
 # performance evaluation
 def plot_losses(train_loss, test_loss,burn_in=20):
@@ -745,10 +765,10 @@ def plot_losses(train_loss, test_loss,burn_in=20):
     plt.legend(frameon=False)
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
-    plt.savefig(os.path.join(hyperparam_dir, plot_file))
+    plt.savefig(os.path.join(results_dir, plot_file))
     plt.close()
 
 
 train_loss = [x.detach().cpu().numpy() if not type(x) == float else np.array(x, dtype='f') for x in train_loss]
-test_loss = [x.detach().cpu().numpy() if not type(x) == float else np.array(x, dtype='f') for x in train_loss]
+test_loss = [x.detach().cpu().numpy() if not type(x) == float else np.array(x, dtype='f') for x in test_loss]
 plot_losses(train_loss, test_loss)

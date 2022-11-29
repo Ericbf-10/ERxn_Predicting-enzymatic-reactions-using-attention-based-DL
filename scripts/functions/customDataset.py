@@ -37,11 +37,11 @@ class RxnDataset(Dataset):
 
         src = torch.tensor(
             [vocab[token] for token in src.replace('\n', '').split(' ')]
-        )
+        ).to(int)
 
         tgt = torch.tensor(
             [vocab[token] for token in tgt.replace('\n', '').split(' ')]
-        )
-        sos_token = torch.Tensor([sos_token])
-        tgt = torch.concat((sos_token, tgt), dim=0).to(int)
+        ).to(int)
+        sos_token = torch.Tensor([sos_token]).to(int)
+        tgt = torch.cat((sos_token, tgt), dim=0).to(int)
         return (src, tgt)

@@ -22,13 +22,13 @@ parser.add_argument("-epoch", action="store", dest="NUM_EPOCHS", type=int, defau
 parser.add_argument("-pati", action="store", dest="PATIENCE", type=int, default=10, help="Patience (default: 10)")
 parser.add_argument("-bs", action="store", dest="BATCH_SIZE", type=int, default=100, help="Batch Size (default: 100)")
 parser.add_argument("-m", action="store", dest="MOMENTUM", type=float, default=0.9, help="Momentum (default: 0.9)")
-parser.add_argument("-pin", action="store_false", dest="PIN_MEMORY", help="Pin Memory (default: False)")
-parser.add_argument("-plen", action="store", dest="PATCH_LENGTH", type=int, default=400, help="Patch Length (default: 400)")
-parser.add_argument("-embed", action="store", dest="EMBED_DIM", type=int, default=768, help="Embedding Dimension (default: 768)")
+parser.add_argument("-pin", action="store_false", dest="PIN_MEMORY", default=False, help="Pin Memory (default: False)")
+parser.add_argument("-plen", action="store", dest="PATCH_LENGTH", type=int, default=200, help="Patch Length (default: 200)")
+parser.add_argument("-embed", action="store", dest="EMBED_DIM", type=int, default=512, help="Embedding Dimension (default: 512)")
 parser.add_argument("-depth", action="store", dest="DEPTH", type=int, default=12, help="Number of Blocks (default: 12)")
-parser.add_argument("-heads", action="store", dest="N_HEADS", type=int, default=12, help="Number of attention heads (default: 12)")
+parser.add_argument("-heads", action="store", dest="N_HEADS", type=int, default=8, help="Number of attention heads (default: 12)")
 parser.add_argument("-mlp", action="store", dest="MLP_RATIO", type=float, default=4.0, help="Hidden dimension of the MLP module (default: 4.0)")
-parser.add_argument("-qkvbias", action="store_true", dest="QKV_BIAS", help="Include bias to Q, K and V projections (default: True)")
+parser.add_argument("-qkvbias", action="store_true", dest="QKV_BIAS", default=False, help="Include bias to Q, K and V projections (default: False)")
 parser.add_argument("-p", action="store", dest="P_DROP", type=float, default=0.1, help="Dropout probability (default: 0.1)")
 parser.add_argument("-attnp", action="store", dest="ATTN_P", type=float, default=0.1, help="Dropout probability (default: 0.1)")
 parser.add_argument("-fout", action="store", dest="out_file", default="out", type=str, help="Output summary file")
@@ -140,7 +140,7 @@ model = ProteinEncoder(
     attn_p=ATTN_P
 ).to(device)
 
-model.load_state_dict(torch.load(os.path.join(results_dir, '10_protein_autoencoder')))
+#model.load_state_dict(torch.load(os.path.join(results_dir, '10_protein_autoencoder')))
 
 ## Training loop
 # Loss
@@ -242,7 +242,7 @@ def plot_losses(train_loss, test_loss,burn_in=20):
 
 
 train_loss = [x.detach().cpu().numpy() if not type(x) == float else np.array(x, dtype='f') for x in train_loss]
-test_loss = [x.detach().cpu().numpy() if not type(x) == float else np.array(x, dtype='f') for x in train_loss]
+test_loss = [x.detach().cpu().numpy() if not type(x) == float else np.array(x, dtype='f') for x in test_loss]
 plot_losses(train_loss, test_loss)
 
 with torch.no_grad():

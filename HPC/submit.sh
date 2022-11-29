@@ -27,22 +27,25 @@
 >train.err
 
 cd ~/projects/ERxn/scripts
-module load cuda/11.3
-module load python3/3.7.11
-module load pandas/1.3.1-python-3.7.11
-module load numpy/1.21.1-python-3.7.11-openblas-0.3.17
-pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+module load cuda/11.6
+module load python3/3.10.7
+module load pandas/1.4.4-python-3.10.7
 
+#pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+#pip3 install torchtext
+pip install torch==1.12.1+cu116 torchvision==0.13.1+cu116 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu116
+pip install torchtext==0.6.0
 pip install --upgrade pip
 pip install  networkx
 pip install --user matplotlib
 pip install tqdm
 pip install biopython
 pip install requests
-pip3 install -U scikit-learn
-pip install perceiver-pytorch
+pip install -U scikit-learn
 
 
 #python3 /zhome/4c/8/164840/projects/ERxn/scripts/12_hyper_param_optimization.py
-python3 /zhome/4c/8/164840/projects/ERxn/scripts/10_protein_autoencoder.py
-python3 /zhome/4c/8/164840/projects/ERxn/scripts/11_protein_encoder.py
+#python3 /zhome/4c/8/164840/projects/ERxn/scripts/10_protein_autoencoder.py
+
+#python3 /zhome/4c/8/164840/projects/ERxn/scripts/13_mol_transformer.py
+python3 /zhome/4c/8/164840/projects/ERxn/scripts/11_protein_encoder.py -optim adam
